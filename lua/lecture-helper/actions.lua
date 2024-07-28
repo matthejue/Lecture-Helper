@@ -52,13 +52,13 @@ local function find_line(timestamp)
 	local line = state.subtitle_file_lines[line_nr]
 	local previous_line
 	while line do
-		line_nr = line_nr + 1
 		local start_time = line:match("%d+:%d+:%d+")
 		if start_time then
 			if start_time > timestamp then
 				return previous_line, line_nr - 1
 			end
 		end
+		line_nr = line_nr + 1
 		previous_line = line
 		line = state.subtitle_file_lines[line_nr]
 	end
