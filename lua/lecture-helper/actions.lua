@@ -2,10 +2,6 @@ local state = require("lecture-helper.state")
 
 local M = {}
 
--- ┌────────────────────────┐
--- │ Keybindings and events │
--- └────────────────────────┘
-
 local function set_subtitles_file()
 	local basepath = vim.fn.expand("%:p:r")
 	local subtitles_file_path = basepath .. ".subtitles"
@@ -95,6 +91,22 @@ function M.next_speech()
 	end
 
 	vim.api.nvim_set_current_line(state.subtitle_file_lines[state.line_nr])
+end
+
+-- function that converts timestampt of the format "hh:mm:ss" to seconds
+local function timestamp_to_seconds(hours, minutes, seconds)
+	return tonumber(hours) * 3600 + tonumber(minutes) * 60 + tonumber(seconds)
+end
+
+function M.goto_speech()
+	local line = vim.api.nvim_get_current_line()
+	local hours, minutes, seconds = line:match("(%d+):(%d+):(%d+)")
+	local seconds = timestamp_to_seconds(hours, minutes, seconds)
+	local handle = io.popen("playerctl position " .. seconds)
+	if not handle then
+		return nil, "Failed to set playerctl position"
+	end
+	handle:close()
 end
 
 function M.replace_symbols()
