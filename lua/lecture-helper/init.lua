@@ -5,19 +5,19 @@ local actions = require("lecture-helper.actions")
 local M = {}
 
 local function set_commands()
-  vim.api.nvim_create_user_command("GetSpeech", actions.get_speech, { desc = state.descs.get_speech })
+  vim.api.nvim_create_user_command("GetSpeech", actions.current_speech, { desc = state.descs.current_speech })
   vim.api.nvim_create_user_command("PreviousSpeech", actions.previous_speech, { desc = state.descs.previous_speech })
   vim.api.nvim_create_user_command("NextSpeech", actions.next_speech, { desc = state.descs.next_speech })
   vim.api.nvim_create_user_command("ReplaceSymbols", actions.replace_symbols, { desc = state.descs.replace_symbols })
 end
 
 local function set_global_keybindings()
-  if state.opts.keys.get_speech then
+  if state.opts.keys.current_speech then
     vim.keymap.set(
       "n",
-      state.opts.keys.get_speech,
-      actions.get_speech, -- ":GetSpeech<cr>",
-      { silent = true, desc = state.descs.get_speech }
+      state.opts.keys.current_speech,
+      actions.current_speech, -- ":GetSpeech<cr>",
+      { silent = true, desc = state.descs.current_speech }
     )
   end
   if state.opts.keys.previous_speech then

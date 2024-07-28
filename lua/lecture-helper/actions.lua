@@ -14,7 +14,7 @@ local function set_subtitles_file()
 		return
 	end
 
-  state.subtitles_file_path = subtitles_file_path
+	state.subtitles_file_path = subtitles_file_path
 	local subtitle_file = io.open(state.subtitles_file_path, "r")
 	if not subtitle_file then
 		print("Error: Failed to open subtitles file " .. subtitles_file_path)
@@ -66,19 +66,19 @@ local function find_line(timestamp)
 		previous_line = line
 		line = state.subtitle_file_lines[line_nr]
 	end
-	return previous_line, line_nr-1
+	return previous_line, line_nr - 1
 end
 
-function M.get_speech()
+function M.current_speech()
 	local timestamp, err = get_playerctl_position()
 	if not timestamp then
 		print("Error: " .. err)
 	end
 
 	set_subtitles_file()
-  local line
+	local line
 	line, state.line_nr = find_line(timestamp)
-  vim.api.nvim_set_current_line(line)
+	vim.api.nvim_set_current_line(line)
 end
 
 function M.previous_speech()

@@ -1,8 +1,9 @@
 local default_options = {
   -- keys = {
-  --  get_speech = "<leader>hg",
+  --  current_speech = "<leader>hc",
   --  previous_speech = "<leader>hp",
   --  next_speech ="<leader>hn",
+  --  goto_speech = "<leader>hg"
   --  replace_symbols = "<leader>hr"
   -- },
   -- symbols = {
