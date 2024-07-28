@@ -50,6 +50,7 @@ local default_options = {
    ["}"] = "\\}",
    ["∞"] = "\\infty"
   },
+  prefix = "" -- "- "
 }
 
 return default_options

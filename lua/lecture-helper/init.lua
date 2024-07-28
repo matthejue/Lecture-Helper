@@ -37,20 +37,20 @@ local function set_global_keybindings()
 			{ silent = true, desc = state.descs.next_speech }
 		)
 	end
-	if state.opts.keys.replace_symbols then
-		vim.keymap.set(
-			"n",
-			state.opts.keys.replace_symbols,
-			actions.replace_symbols,
-			{ silent = true, desc = state.descs.replace_symbols }
-		)
-	end
 	if state.opts.keys.goto_speech then
 		vim.keymap.set(
 			"n",
 			state.opts.keys.goto_speech,
 			actions.goto_speech,
 			{ silent = true, desc = state.descs.goto_speech }
+		)
+	end
+	if state.opts.keys.replace_symbols then
+		vim.keymap.set(
+			"n",
+			state.opts.keys.replace_symbols,
+			actions.replace_symbols,
+			{ silent = true, desc = state.descs.replace_symbols }
 		)
 	end
 end

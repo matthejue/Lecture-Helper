@@ -74,7 +74,7 @@ function M.current_speech()
 	set_subtitles_file()
 	local line
 	line, state.line_nr = find_line(timestamp)
-	vim.api.nvim_set_current_line(line)
+	vim.api.nvim_set_current_line(state.opts.prefix .. line)
 end
 
 function M.previous_speech()
@@ -82,7 +82,7 @@ function M.previous_speech()
 		state.line_nr = state.line_nr - 1
 	end
 
-	vim.api.nvim_set_current_line(state.subtitle_file_lines[state.line_nr])
+	vim.api.nvim_set_current_line(state.opts.prefix .. state.subtitle_file_lines[state.line_nr])
 end
 
 function M.next_speech()
@@ -90,7 +90,7 @@ function M.next_speech()
 		state.line_nr = state.line_nr + 1
 	end
 
-	vim.api.nvim_set_current_line(state.subtitle_file_lines[state.line_nr])
+	vim.api.nvim_set_current_line(state.opts.prefix .. state.subtitle_file_lines[state.line_nr])
 end
 
 -- function that converts timestampt of the format "hh:mm:ss" to seconds
