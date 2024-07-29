@@ -83,8 +83,8 @@ local function insert_lines(n, below)
 	local cline = cursor_pos[1] - 1
 
 	local insert_lines = {}
-	for i = 0, n-1, 1 do
-		insert_lines[i+1] = state.opts.prefix .. state.subtitle_file_lines[state.line_nr - (below and n-1 or 0) + i]
+	for i = 0, n - 1, 1 do
+		insert_lines[i + 1] = state.opts.prefix .. state.subtitle_file_lines[state.line_nr - (below and n - 1 or 0) + i]
 	end
 
 	vim.api.nvim_buf_set_lines(bufnr, cline + (below and 1 or 0), cline + (below and 1 or 0), false, insert_lines)
@@ -93,7 +93,7 @@ end
 function M.previous_speech(count)
 	count = count or 1
 
-  count = state.line_nr - math.max(state.line_nr - count, 1)
+	count = state.line_nr - math.max(state.line_nr - count, 1)
 	state.line_nr = state.line_nr - count
 	insert_lines(count, false)
 end
@@ -101,9 +101,26 @@ end
 function M.next_speech(count)
 	count = count or 1
 
-	count =  math.min(state.line_nr + count, #state.subtitle_file_lines) - state.line_nr
+	count = math.min(state.line_nr + count, #state.subtitle_file_lines) - state.line_nr
 	state.line_nr = state.line_nr + count
 	insert_lines(count, true)
+end
+
+function M.merge_lines()
+	local _, start_line, _, _ = unpack(vim.fn.getpos("v"))
+	local _, end_line, _, _ = unpack(vim.fn.getpos("."))
+	local lines = vim.fn.getline(start_line, end_line)
+
+	for i = 2, #lines do
+		lines[i] = string.sub(lines[i], 12)
+	end
+	local merged_line = table.concat(lines, " ")
+	vim.fn.setline(start_line, merged_line)
+	if end_line > start_line then
+		vim.fn.deletebufline(vim.fn.bufnr(), start_line + 1, end_line)
+	end
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", true)
+  vim.api.nvim_win_set_cursor(0, {start_line, 0})
 end
 
 -- function that converts timestampt of the format "hh:mm:ss" to seconds

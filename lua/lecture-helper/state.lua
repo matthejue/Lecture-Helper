@@ -6,6 +6,7 @@ M.descs = {
   current_speech = "Get current speech from video",
   previous_speech = "Get previous speech from video",
   next_speech = "Get next speech from video",
+  merge_lines = "Merge newly inserted lines",
   goto_speech = "Goto timestamp position in video",
   replace_symbols = "Replace math symbols on line by latex",
 }

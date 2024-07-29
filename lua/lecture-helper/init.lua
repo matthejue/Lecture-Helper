@@ -12,6 +12,7 @@ local function set_commands()
 	vim.api.nvim_create_user_command("NextSpeech", function(arg)
 		actions.next_speech(tonumber(arg.args))
 	end, { desc = state.descs.next_speech, nargs = "?" })
+	vim.api.nvim_create_user_command("MergeLines", actions.merge_lines, { desc = state.descs.merge_lines })
 	vim.api.nvim_create_user_command("GotoSpeech", actions.goto_speech, { desc = state.descs.goto_speech })
 	vim.api.nvim_create_user_command("ReplaceSymbols", actions.replace_symbols, { desc = state.descs.replace_symbols })
 end
@@ -26,24 +27,22 @@ local function set_global_keybindings()
 		)
 	end
 	if state.opts.keys.previous_speech then
-		vim.keymap.set(
-			"n",
-			state.opts.keys.previous_speech,
-			function ()
-        actions.previous_speech(vim.v.count1)
-			end,
-			{ silent = true, desc = state.descs.previous_speech }
-		)
+		vim.keymap.set("n", state.opts.keys.previous_speech, function()
+			actions.previous_speech(vim.v.count1)
+		end, { silent = true, desc = state.descs.previous_speech })
 	end
 	if state.opts.keys.next_speech then
-		vim.keymap.set(
-			"n",
-			state.opts.keys.next_speech,
-			function ()
-        actions.next_speech(vim.v.count1)
-			end,
-			{ silent = true, desc = state.descs.next_speech }
-		)
+		vim.keymap.set("n", state.opts.keys.next_speech, function()
+			actions.next_speech(vim.v.count1)
+		end, { silent = true, desc = state.descs.next_speech })
+	end
+	if state.opts.keys.merge_lines then
+		vim.keymap.set("v", state.opts.keys.merge_lines, function()
+			actions.merge_lines()
+		end, {
+			silent = true,
+			desc = state.descs.merge_lines,
+		})
 	end
 	if state.opts.keys.goto_speech then
 		vim.keymap.set(
