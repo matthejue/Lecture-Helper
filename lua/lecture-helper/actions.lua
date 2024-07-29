@@ -50,12 +50,12 @@ end
 local function find_line(timestamp)
 	local line_nr = 1
 	local line = state.subtitle_file_lines[line_nr]
-	local previous_line
+	local previous_line = state.subtitle_file_lines[line_nr]
 	while line do
 		local start_time = line:match("%d+:%d+:%d+")
 		if start_time then
 			if start_time > timestamp then
-				return previous_line, line_nr - 1
+				return previous_line, math.max(line_nr - 1, 1)
 			end
 		end
 		line_nr = line_nr + 1
@@ -77,20 +77,33 @@ function M.current_speech()
 	vim.api.nvim_set_current_line(state.opts.prefix .. line)
 end
 
-function M.previous_speech()
-	if state.line_nr - 1 > 0 then
-		state.line_nr = state.line_nr - 1
+local function insert_lines(n, below)
+	local bufnr = vim.api.nvim_get_current_buf()
+	local cursor_pos = vim.api.nvim_win_get_cursor(0)
+	local cline = cursor_pos[1] - 1
+
+	local insert_lines = {}
+	for i = 0, n-1, 1 do
+		insert_lines[i+1] = state.opts.prefix .. state.subtitle_file_lines[state.line_nr - (below and n-1 or 0) + i]
 	end
 
-	vim.api.nvim_set_current_line(state.opts.prefix .. state.subtitle_file_lines[state.line_nr])
+	vim.api.nvim_buf_set_lines(bufnr, cline + (below and 1 or 0), cline + (below and 1 or 0), false, insert_lines)
 end
 
-function M.next_speech()
-	if state.line_nr + 1 < #state.subtitle_file_lines + 1 then
-		state.line_nr = state.line_nr + 1
-	end
+function M.previous_speech(count)
+	count = count or 1
 
-	vim.api.nvim_set_current_line(state.opts.prefix .. state.subtitle_file_lines[state.line_nr])
+  count = state.line_nr - math.max(state.line_nr - count, 1)
+	state.line_nr = state.line_nr - count
+	insert_lines(count, false)
+end
+
+function M.next_speech(count)
+	count = count or 1
+
+	count =  math.min(state.line_nr + count, #state.subtitle_file_lines) - state.line_nr
+	state.line_nr = state.line_nr + count
+	insert_lines(count, true)
 end
 
 -- function that converts timestampt of the format "hh:mm:ss" to seconds
@@ -101,7 +114,7 @@ end
 function M.goto_speech()
 	local line = vim.api.nvim_get_current_line()
 	local hours, minutes, seconds = line:match("(%d+):(%d+):(%d+)")
-	local seconds = timestamp_to_seconds(hours, minutes, seconds)
+	seconds = timestamp_to_seconds(hours, minutes, seconds)
 	local handle = io.popen("playerctl position " .. seconds)
 	if not handle then
 		return nil, "Failed to set playerctl position"
