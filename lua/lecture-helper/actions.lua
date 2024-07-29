@@ -90,12 +90,25 @@ local function insert_lines(n, below)
 	vim.api.nvim_buf_set_lines(bufnr, cline + (below and 1 or 0), cline + (below and 1 or 0), false, insert_lines)
 end
 
+local function move_cursor(count)
+	local current_line = vim.api.nvim_win_get_cursor(0)[1]
+  local new_line
+	if count > 0 then
+		local buf = vim.api.nvim_get_current_buf()
+		new_line = math.min(vim.api.nvim_buf_line_count(buf), current_line + count)
+  elseif count < 0 then
+		new_line = math.max(1, current_line + count)
+	end
+	vim.api.nvim_win_set_cursor(0, { new_line, 0 })
+end
+
 function M.previous_speech(count)
 	count = count or 1
 
 	count = state.line_nr - math.max(state.line_nr - count, 1)
 	state.line_nr = state.line_nr - count
 	insert_lines(count, false)
+  move_cursor(-count)
 end
 
 function M.next_speech(count)
@@ -104,11 +117,15 @@ function M.next_speech(count)
 	count = math.min(state.line_nr + count, #state.subtitle_file_lines) - state.line_nr
 	state.line_nr = state.line_nr + count
 	insert_lines(count, true)
+  move_cursor(count)
 end
 
 function M.merge_lines()
 	local _, start_line, _, _ = unpack(vim.fn.getpos("v"))
 	local _, end_line, _, _ = unpack(vim.fn.getpos("."))
+  if start_line > end_line then
+    start_line, end_line = end_line, start_line
+  end
 	local lines = vim.fn.getline(start_line, end_line)
 
 	for i = 2, #lines do
@@ -120,7 +137,7 @@ function M.merge_lines()
 		vim.fn.deletebufline(vim.fn.bufnr(), start_line + 1, end_line)
 	end
 	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", true)
-  vim.api.nvim_win_set_cursor(0, {start_line, 0})
+	vim.api.nvim_win_set_cursor(0, { start_line, 0 })
 end
 
 -- function that converts timestampt of the format "hh:mm:ss" to seconds
