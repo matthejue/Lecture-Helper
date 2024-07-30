@@ -35,7 +35,7 @@ local function get_playerctl_position()
 		return nil, "Failed to get position from playerctl"
 	end
 
-	local total_seconds = math.ceil(position)
+	local total_seconds = math.floor(position)
 
 	local hours = math.floor(total_seconds / 3600)
 	local minutes = math.floor((total_seconds % 3600) / 60)
@@ -50,17 +50,19 @@ end
 local function find_line(timestamp)
 	local line_nr = 1
 	local line = state.subtitle_file_lines[line_nr]
+	local previous_line = state.subtitle_file_lines[line_nr]
 	while line do
 		local start_time = line:match("%d+:%d+:%d+")
 		if start_time then
 			if start_time > timestamp then
-				return line, line_nr
+				return previous_line, math.max(line_nr - 1, 1)
 			end
 		end
 		line_nr = line_nr + 1
+		previous_line = line
 		line = state.subtitle_file_lines[line_nr]
 	end
-	return state.subtitle_file_lines[line_nr - 1], line_nr - 1
+	return previous_line, line_nr - 1
 end
 
 function M.current_speech()
@@ -90,11 +92,11 @@ end
 
 local function move_cursor(count)
 	local current_line = vim.api.nvim_win_get_cursor(0)[1]
-	local new_line
+  local new_line
 	if count > 0 then
 		local buf = vim.api.nvim_get_current_buf()
 		new_line = math.min(vim.api.nvim_buf_line_count(buf), current_line + count)
-	elseif count < 0 then
+  elseif count < 0 then
 		new_line = math.max(1, current_line + count)
 	end
 	vim.api.nvim_win_set_cursor(0, { new_line, 0 })
@@ -106,7 +108,7 @@ function M.previous_speech(count)
 	count = state.line_nr - math.max(state.line_nr - count, 1)
 	state.line_nr = state.line_nr - count
 	insert_lines(count, false)
-	move_cursor(-count)
+  move_cursor(-count)
 end
 
 function M.next_speech(count)
@@ -115,15 +117,15 @@ function M.next_speech(count)
 	count = math.min(state.line_nr + count, #state.subtitle_file_lines) - state.line_nr
 	state.line_nr = state.line_nr + count
 	insert_lines(count, true)
-	move_cursor(count)
+  move_cursor(count)
 end
 
 function M.merge_lines()
 	local _, start_line, _, _ = unpack(vim.fn.getpos("v"))
 	local _, end_line, _, _ = unpack(vim.fn.getpos("."))
-	if start_line > end_line then
-		start_line, end_line = end_line, start_line
-	end
+  if start_line > end_line then
+    start_line, end_line = end_line, start_line
+  end
 	local lines = vim.fn.getline(start_line, end_line)
 
 	for i = 2, #lines do
