@@ -1,6 +1,7 @@
 local default_options = {
 	-- keys = {
 	--  current_speech = "<leader>hc",
+	--  update_linenr = "<leader>hu",
 	--  previous_speech = "<leader>hp",
 	--  next_speech ="<leader>hn",
 	--  goto_speech = "<leader>hg"

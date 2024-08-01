@@ -4,8 +4,15 @@ local actions = require("lecture-helper.actions")
 
 local M = {}
 
+--  TODO: activate only for .annot file extension, maybe option of lazy.nvim
+
 local function set_commands()
-	vim.api.nvim_create_user_command("CurrentSpeech", actions.current_speech, { desc = state.descs.current_speech })
+	vim.api.nvim_create_user_command("CurrentSpeech", function()
+		actions.current_speech(false)
+	end, { desc = state.descs.current_speech })
+	vim.api.nvim_create_user_command("UpdateSpeechLineNr", function()
+		actions.current_speech(true)
+	end, { desc = state.descs.update_linenr })
 	vim.api.nvim_create_user_command("PreviousSpeech", function(arg)
 		actions.previous_speech(tonumber(arg.args))
 	end, { desc = state.descs.previous_speech, nargs = "?" })
@@ -22,9 +29,16 @@ local function set_global_keybindings()
 		vim.keymap.set(
 			"n",
 			state.opts.keys.current_speech,
-			actions.current_speech, -- ":GetSpeech<cr>",
+			function()
+				actions.current_speech(false)
+			end, -- ":GetSpeech<cr>",
 			{ silent = true, desc = state.descs.current_speech }
 		)
+	end
+	if state.opts.keys.update_linenr then
+		vim.keymap.set("n", state.opts.keys.update_linenr, function()
+			actions.current_speech(true)
+		end, { silent = true, desc = state.descs.update_linenr })
 	end
 	if state.opts.keys.previous_speech then
 		vim.keymap.set("n", state.opts.keys.previous_speech, function()
