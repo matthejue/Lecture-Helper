@@ -8,6 +8,7 @@ local default_options = {
 	--  goto_timestamp = "<leader>ht"
 	--  merge_lines = "M",
 	--  slice_to_line_above = "<leader>hs",
+	--  remove_slice = "<leader>hd",
 	--  replace_symbols = "<leader>hr"
 	-- },
 	symbols = {

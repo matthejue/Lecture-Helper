@@ -25,6 +25,7 @@ local function set_commands()
 		actions.slice_to_line_above,
 		{ desc = state.descs.slice_to_line_above }
 	)
+	vim.api.nvim_create_user_command("RemoveSlice", actions.remove_slice, { desc = state.descs.remove_slice })
 	vim.api.nvim_create_user_command("GotoSpeech", actions.goto_speech, { desc = state.descs.goto_speech })
 	vim.api.nvim_create_user_command("GotoTimestamp", actions.goto_speech, { desc = state.descs.goto_timestamp })
 	vim.api.nvim_create_user_command("ReplaceSymbols", actions.replace_symbols, { desc = state.descs.replace_symbols })
@@ -70,6 +71,14 @@ local function set_global_keybindings()
 			state.opts.keys.slice_to_line_above,
 			actions.slice_to_line_above,
 			{ silent = true, desc = state.descs.slice_to_line_above }
+		)
+	end
+	if state.opts.keys.remove_slice then
+		vim.keymap.set(
+			"n",
+			state.opts.keys.remove_slice,
+			actions.remove_slice,
+			{ silent = true, desc = state.descs.remove_slice }
 		)
 	end
 	if state.opts.keys.goto_speech then
