@@ -48,11 +48,12 @@ end
 
 -- function that checks for every line of the subtitles file until it finds one that contains a timestamp that is bigger than the timestamp received from playerctl and return the line and line number
 local function find_line(timestamp)
+	local start_time
 	local line_nr = 1
 	local line = state.subtitle_file_lines[line_nr]
 	local previous_line = state.subtitle_file_lines[line_nr]
 	while line do
-		local start_time = line:match("%d+:%d+:%d+")
+		start_time = line:match("%d+:%d+:%d+")
 		if start_time then
 			if start_time > timestamp then
 				return previous_line, math.max(line_nr - 1, 1)
@@ -66,14 +67,14 @@ local function find_line(timestamp)
 end
 
 function M.current_speech(update_linenr)
-  local timestamp, err
+	local timestamp, err
 	if update_linenr then
-    local line = vim.api.nvim_get_current_line()
+		local line = vim.api.nvim_get_current_line()
 		timestamp = line:match("%d+:%d+:%d+")
 		if not timestamp then
 			print("Error: Line does not contain timestamp")
 		end
-  else
+	else
 		timestamp, err = get_playerctl_position()
 		if not timestamp then
 			print("Error: " .. err)
@@ -165,6 +166,33 @@ function M.goto_speech()
 		return nil, "Failed to set playerctl position"
 	end
 	handle:close()
+end
+
+-- function looks up current timestamp with playerctl and finds the closest timestamp in the current buffer
+function M.goto_timestamp()
+	local timestamp = get_playerctl_position()
+	local start_time
+
+	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+	local line_nr = 1
+	local line = lines[line_nr]
+	while line do
+		start_time = line:match("%d+:%d+:%d+")
+		if not start_time then
+			goto continue
+		end
+		if start_time then
+			if start_time > timestamp then
+				break
+			end
+		end
+		::continue::
+		line_nr = line_nr + 1
+		line = lines[line_nr]
+	end
+
+	vim.api.nvim_win_set_cursor(0, { line_nr - 1, 0 })
 end
 
 function M.replace_symbols()

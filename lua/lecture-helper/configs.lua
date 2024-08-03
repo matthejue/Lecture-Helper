@@ -5,6 +5,7 @@ local default_options = {
 	--  previous_speech = "<leader>hp",
 	--  next_speech ="<leader>hn",
 	--  goto_speech = "<leader>hg"
+	--  goto_timestamp = "<leader>ht"
 	--  merge_lines = "M",
 	--  replace_symbols = "<leader>hr"
 	-- },
