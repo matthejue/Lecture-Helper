@@ -13,6 +13,11 @@ local function set_commands()
 	vim.api.nvim_create_user_command("UpdateSpeechLineNr", function()
 		actions.current_speech(true)
 	end, { desc = state.descs.update_linenr })
+	vim.api.nvim_create_user_command(
+		"UpdateTimestamp",
+		actions.update_timestamp,
+		{ desc = state.descs.update_timestamp }
+	)
 	vim.api.nvim_create_user_command("PreviousSpeech", function(arg)
 		actions.previous_speech(tonumber(arg.args))
 	end, { desc = state.descs.previous_speech, nargs = "?" })
@@ -46,6 +51,14 @@ local function set_global_keybindings()
 		vim.keymap.set("n", state.opts.keys.update_linenr, function()
 			actions.current_speech(true)
 		end, { silent = true, desc = state.descs.update_linenr })
+	end
+	if state.opts.keys.update_timestamp then
+		vim.keymap.set(
+			"n",
+			state.opts.keys.update_timestamp,
+			actions.update_timestamp,
+			{ silent = true, desc = state.descs.update_timestamp }
+		)
 	end
 	if state.opts.keys.previous_speech then
 		vim.keymap.set("n", state.opts.keys.previous_speech, function()

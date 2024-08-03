@@ -4,7 +4,8 @@ M.opts = {}
 
 M.descs = {
   current_speech = "Get current speech from video",
-  update_linenr = "Updates timestamp to current line",
+  update_linenr = "Updates current line to current timetsamp",
+  update_timestamp = "Updates timestamp to current timestamp",
   previous_speech = "Get previous speech from video",
   next_speech = "Get next speech from video",
   merge_lines = "Merge newly inserted lines",

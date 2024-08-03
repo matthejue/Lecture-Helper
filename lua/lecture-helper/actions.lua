@@ -89,6 +89,17 @@ function M.current_speech(update_linenr)
 	end
 end
 
+function M.update_timestamp()
+	local current_timestamp = get_playerctl_position()
+  set_subtitles_file()
+	local line_with_timestamp, _ = find_line(current_timestamp)
+	local line_timestamp = line_with_timestamp:match("%d+:%d+:%d+")
+
+  local line = vim.api.nvim_get_current_line()
+	line = line:gsub("%d+:%d+:%d+", line_timestamp)
+  vim.api.nvim_set_current_line(line)
+end
+
 local function insert_lines(n, below)
 	local bufnr = vim.api.nvim_get_current_buf()
 	local cursor_pos = vim.api.nvim_win_get_cursor(0)
