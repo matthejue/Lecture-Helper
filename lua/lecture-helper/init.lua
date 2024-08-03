@@ -20,6 +20,11 @@ local function set_commands()
 		actions.next_speech(tonumber(arg.args))
 	end, { desc = state.descs.next_speech, nargs = "?" })
 	vim.api.nvim_create_user_command("MergeLines", actions.merge_lines, { desc = state.descs.merge_lines })
+	vim.api.nvim_create_user_command(
+		"SliceToLineAbove",
+		actions.slice_to_line_above,
+		{ desc = state.descs.slice_to_line_above }
+	)
 	vim.api.nvim_create_user_command("GotoSpeech", actions.goto_speech, { desc = state.descs.goto_speech })
 	vim.api.nvim_create_user_command("GotoTimestamp", actions.goto_speech, { desc = state.descs.goto_timestamp })
 	vim.api.nvim_create_user_command("ReplaceSymbols", actions.replace_symbols, { desc = state.descs.replace_symbols })
@@ -58,6 +63,14 @@ local function set_global_keybindings()
 			silent = true,
 			desc = state.descs.merge_lines,
 		})
+	end
+	if state.opts.keys.slice_to_line_above then
+		vim.keymap.set(
+			"n",
+			state.opts.keys.slice_to_line_above,
+			actions.slice_to_line_above,
+			{ silent = true, desc = state.descs.slice_to_line_above }
+		)
 	end
 	if state.opts.keys.goto_speech then
 		vim.keymap.set(

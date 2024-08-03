@@ -7,6 +7,7 @@ local default_options = {
 	--  goto_speech = "<leader>hg"
 	--  goto_timestamp = "<leader>ht"
 	--  merge_lines = "M",
+	--  slice_to_line_above = "<leader>hs",
 	--  replace_symbols = "<leader>hr"
 	-- },
 	symbols = {

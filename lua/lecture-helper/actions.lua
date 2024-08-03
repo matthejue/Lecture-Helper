@@ -152,6 +152,29 @@ function M.merge_lines()
 	vim.api.nvim_win_set_cursor(0, { start_line, 0 })
 end
 
+function M.slice_to_line_above()
+	local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+	if row == 1 then
+		return
+	end
+
+	local current_line = vim.api.nvim_get_current_line()
+	local previous_line = vim.api.nvim_buf_get_lines(0, row - 2, row - 1, false)[1]
+
+	local text_to_move = current_line:sub(12, col+1)
+
+	-- Update the previous line
+	previous_line = previous_line .. " " .. text_to_move
+	vim.api.nvim_buf_set_lines(0, row - 2, row - 1, false, { previous_line })
+
+	-- Update the current line
+	current_line = current_line:sub(1, 11) .. current_line:sub(col + 1 + 2)
+	vim.api.nvim_buf_set_lines(0, row - 1, row, false, { current_line })
+
+	-- Move the cursor to the new position on the current line
+	vim.api.nvim_win_set_cursor(0, { row, 11 })
+end
+
 -- function that converts timestampt of the format "hh:mm:ss" to seconds
 local function timestamp_to_seconds(hours, minutes, seconds)
 	return tonumber(hours) * 3600 + tonumber(minutes) * 60 + tonumber(seconds)
