@@ -14,6 +14,7 @@ M.descs = {
   goto_speech = "Goto position of timestamp in video",
   goto_timestamp = "Goto closest timestamp to video runtime",
   replace_symbols = "Replace math symbols on line by latex",
+  remove_words = "Removes unneeded words",
 }
 
 M.subtitles_file_path = ""

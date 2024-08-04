@@ -11,8 +11,9 @@ local default_options = {
 	--  slice_to_line_above = "<leader>hs",
 	--  remove_slice = "<leader>hd",
 	--  replace_symbols = "<leader>hr"
+	--  remove_words = "<leader>hR",
 	-- },
-	symbols = {
+	replace_symbols = {
 		["⊔"] = "\\sqcup",
 		["⊑"] = "\\sqsubseteq",
 		["⊆"] = "\\subseteq",
@@ -63,6 +64,10 @@ local default_options = {
 		["4%."] = "\\item",
 	},
 	prefix = "", -- "- "
+	unneeded_words = {
+		"uh",
+		"um",
+	},
 }
 
 return default_options

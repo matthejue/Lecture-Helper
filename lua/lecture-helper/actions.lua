@@ -91,13 +91,13 @@ end
 
 function M.update_timestamp()
 	local current_timestamp = get_playerctl_position()
-  set_subtitles_file()
+	set_subtitles_file()
 	local line_with_timestamp, _ = find_line(current_timestamp)
 	local line_timestamp = line_with_timestamp:match("%d+:%d+:%d+")
 
-  local line = vim.api.nvim_get_current_line()
+	local line = vim.api.nvim_get_current_line()
 	line = line:gsub("%d+:%d+:%d+", line_timestamp)
-  vim.api.nvim_set_current_line(line)
+	vim.api.nvim_set_current_line(line)
 end
 
 local function insert_lines(n, below)
@@ -245,10 +245,46 @@ end
 
 function M.replace_symbols()
 	local current_line = vim.api.nvim_get_current_line()
-	for i, v in pairs(state.opts.symbols) do
+	for i, v in pairs(state.opts.replace_symbols) do
 		current_line = string.gsub(current_line, i, v .. " ")
 	end
 	vim.api.nvim_set_current_line(current_line)
+end
+
+local function remove_duplicates(line)
+	local no_duplicate = {}
+	local result_line = {}
+
+	for word in string.gmatch(line, "%S+") do
+		if no_duplicate[word] then
+			no_duplicate[word] = false
+		else
+			no_duplicate[word] = true
+		end
+    table.insert(result_line, word)
+	end
+
+	local final_result = {}
+	for _, word in ipairs(result_line) do
+		if no_duplicate[word] then
+			table.insert(final_result, word)
+    else
+			no_duplicate[word] = true
+		end
+	end
+
+	local new_line = table.concat(final_result, " ")
+
+	return new_line
+end
+
+function M.remove_words()
+	local line = vim.api.nvim_get_current_line()
+	line = remove_duplicates(line)
+	for _, v in ipairs(state.opts.unneeded_words) do
+		line = line:gsub(" " .. v, "")
+	end
+	vim.api.nvim_set_current_line(line)
 end
 
 return M
