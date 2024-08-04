@@ -9,6 +9,7 @@ local default_options = {
 	--  goto_timestamp = "<leader>ht"
 	--  merge_lines = "M",
 	--  slice_to_line_above = "<leader>hs",
+	--  slice_to_line_below = "<leader>hS",
 	--  remove_slice = "<leader>hd",
 	--  replace_symbols = "<leader>hr"
 	--  remove_words = "<leader>hR",
@@ -66,7 +67,11 @@ local default_options = {
 	prefix = "", -- "- "
 	unneeded_words = {
 		"uh",
+		"oh",
 		"um",
+		"yeah",
+		"sorry",
+		"well",
 	},
 }
 

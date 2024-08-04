@@ -174,16 +174,31 @@ function M.slice_to_line_above()
 
 	local text_to_move = current_line:sub(12, col + 1)
 
-	-- Update the previous line
 	previous_line = previous_line .. " " .. text_to_move
 	vim.api.nvim_buf_set_lines(0, row - 2, row - 1, false, { previous_line })
 
-	-- Update the current line
 	current_line = current_line:sub(1, 11) .. current_line:sub(col + 3)
 	vim.api.nvim_buf_set_lines(0, row - 1, row, false, { current_line })
 
-	-- Move the cursor to the new position on the current line
 	vim.api.nvim_win_set_cursor(0, { row, 11 })
+end
+
+function M.slice_to_line_below()
+	local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+	if row == 1 then
+		return
+	end
+
+	local current_line = vim.api.nvim_get_current_line()
+	local next_line = vim.api.nvim_buf_get_lines(0, row, row+1, false)[1]
+
+	local text_to_move = current_line:sub(col + 3)
+
+	next_line = next_line:sub(1, 10) .. " " .. text_to_move .. " " .. next_line:sub(12)
+	vim.api.nvim_buf_set_lines(0, row, row + 1, false, { next_line })
+
+	current_line = current_line:sub(1, col + 1)
+	vim.api.nvim_set_current_line(current_line)
 end
 
 function M.remove_slice()
@@ -256,19 +271,19 @@ local function remove_duplicates(line)
 	local result_line = {}
 
 	for word in string.gmatch(line, "%S+") do
-    if no_duplicate[word] == nil then
+		if no_duplicate[word] == nil then
 			no_duplicate[word] = true
-    elseif no_duplicate[word] then
+		elseif no_duplicate[word] then
 			no_duplicate[word] = false
 		end
-    table.insert(result_line, word)
+		table.insert(result_line, word)
 	end
 
 	local final_result = {}
 	for _, word in ipairs(result_line) do
 		if no_duplicate[word] then
 			table.insert(final_result, word)
-    else
+		else
 			no_duplicate[word] = true
 		end
 	end
