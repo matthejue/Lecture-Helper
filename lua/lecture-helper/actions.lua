@@ -256,10 +256,10 @@ local function remove_duplicates(line)
 	local result_line = {}
 
 	for word in string.gmatch(line, "%S+") do
-		if no_duplicate[word] then
-			no_duplicate[word] = false
-		else
+    if no_duplicate[word] == nil then
 			no_duplicate[word] = true
+    elseif no_duplicate[word] then
+			no_duplicate[word] = false
 		end
     table.insert(result_line, word)
 	end
