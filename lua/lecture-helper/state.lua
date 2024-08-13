@@ -15,6 +15,7 @@ M.descs = {
   goto_speech = "Goto position of timestamp in video",
   goto_timestamp = "Goto closest timestamp to video runtime",
   replace_symbols = "Replace math symbols on line by latex",
+  convert_textmode = "Convert mathmode to textmode",
   remove_words = "Removes unneeded words",
 }
 

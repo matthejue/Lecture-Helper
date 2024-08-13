@@ -190,7 +190,7 @@ function M.slice_to_line_below()
 	end
 
 	local current_line = vim.api.nvim_get_current_line()
-	local next_line = vim.api.nvim_buf_get_lines(0, row, row+1, false)[1]
+	local next_line = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
 
 	local text_to_move = current_line:sub(col + 3)
 
@@ -263,6 +263,15 @@ function M.replace_symbols()
 	for i, v in pairs(state.opts.replace_symbols) do
 		current_line = string.gsub(current_line, i, v .. " ")
 	end
+	vim.api.nvim_set_current_line(current_line)
+end
+
+function M.convert_textmode()
+	local current_line = vim.api.nvim_get_current_line()
+	current_line = current_line:gsub("%$", "")
+  -- look for the symbol _ and replace it and the word directly after it by \textsubscript{word}
+  current_line = current_line:gsub("_(%S+)", "\\textsubscript{%1}")
+  current_line = current_line:gsub("%^(%S+)", "\\textsuperscript{%1}")
 	vim.api.nvim_set_current_line(current_line)
 end
 

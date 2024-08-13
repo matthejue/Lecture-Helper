@@ -39,6 +39,11 @@ local function set_commands()
 	vim.api.nvim_create_user_command("GotoSpeech", actions.goto_speech, { desc = state.descs.goto_speech })
 	vim.api.nvim_create_user_command("GotoTimestamp", actions.goto_speech, { desc = state.descs.goto_timestamp })
 	vim.api.nvim_create_user_command("ReplaceSymbols", actions.replace_symbols, { desc = state.descs.replace_symbols })
+	vim.api.nvim_create_user_command(
+		"ConvertTextmode",
+		actions.convert_textmode,
+		{ desc = state.descs.convert_textmode }
+	)
 	vim.api.nvim_create_user_command("RemoveWords", actions.remove_words, { desc = state.descs.remove_words })
 end
 
@@ -130,6 +135,14 @@ local function set_global_keybindings()
 			state.opts.keys.replace_symbols,
 			actions.replace_symbols,
 			{ silent = true, desc = state.descs.replace_symbols }
+		)
+	end
+	if state.opts.keys.convert_textmode then
+		vim.keymap.set(
+			"n",
+			state.opts.keys.convert_textmode,
+			actions.convert_textmode,
+			{ silent = true, desc = state.descs.convert_textmode }
 		)
 	end
 	if state.opts.keys.remove_words then

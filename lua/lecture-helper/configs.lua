@@ -12,6 +12,7 @@ local default_options = {
 	--  slice_to_line_below = "<leader>hS",
 	--  remove_slice = "<leader>hd",
 	--  replace_symbols = "<leader>hr"
+  --  convert_textmode = "<leader>hT"
 	--  remove_words = "<leader>hR",
 	-- },
 	replace_symbols = {
