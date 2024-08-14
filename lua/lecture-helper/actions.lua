@@ -272,6 +272,7 @@ function M.convert_textmode()
   -- look for the symbol _ and replace it and the word directly after it by \textsubscript{word}
   current_line = current_line:gsub("_(%S+)", "\\textsubscript{%1}")
   current_line = current_line:gsub("%^(%S+)", "\\textsuperscript{%1}")
+  current_line = current_line:gsub("\\alert{([^}]*)}", "\\cul{%1}")
 	vim.api.nvim_set_current_line(current_line)
 end
 
