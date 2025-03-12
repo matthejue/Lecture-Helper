@@ -14,6 +14,8 @@ local default_options = {
 	--  replace_symbols = "<leader>hr"
 	--  convert_textmode = "<leader>hT"
 	--  remove_words = "<leader>hR",
+	--  execute_line = "<leader>he",
+	--  open_link = "<leader>hl",
 	-- },
 	replace_symbols = {
 		["⊔"] = "\\sqcup",

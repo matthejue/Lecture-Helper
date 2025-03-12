@@ -17,6 +17,8 @@ M.descs = {
   replace_symbols = "Replace math symbols on line by latex",
   convert_textmode = "Convert mathmode to textmode",
   remove_words = "Removes unneeded words",
+  execute_line = "Execute line",
+  open_link = "Open link",
 }
 
 M.subtitles_file_path = ""

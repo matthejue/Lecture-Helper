@@ -45,6 +45,7 @@ local function set_commands()
 		{ desc = state.descs.convert_textmode }
 	)
 	vim.api.nvim_create_user_command("RemoveWords", actions.remove_words, { desc = state.descs.remove_words })
+	vim.api.nvim_create_user_command("ExecuteLine", actions.execute_line, { desc = state.descs.execute_line })
 end
 
 local function set_global_keybindings()
@@ -151,6 +152,22 @@ local function set_global_keybindings()
 			state.opts.keys.remove_words,
 			actions.remove_words,
 			{ silent = true, desc = state.descs.remove_words }
+		)
+	end
+	if state.opts.keys.execute_line then
+		vim.keymap.set(
+			"n",
+			state.opts.keys.execute_line,
+			actions.execute_line,
+			{ silent = true, desc = state.descs.execute_line }
+		)
+	end
+	if state.opts.keys.open_link then
+		vim.keymap.set(
+			"n",
+			state.opts.keys.open_link,
+			actions.open_link,
+			{ silent = true, desc = state.descs.open_link }
 		)
 	end
 end

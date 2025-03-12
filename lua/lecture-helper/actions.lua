@@ -269,28 +269,28 @@ end
 function M.convert_textmode()
 	local current_line = vim.api.nvim_get_current_line()
 	current_line = current_line:gsub("%$", "")
-  -- look for the symbol _ and replace it and the word directly after it by \textsubscript{word}
-  current_line = current_line:gsub("_{([^}]+)}", "\\textsubscript{%1}")
-  current_line = current_line:gsub("_(%S)", "\\textsubscript{%1}")
-  current_line = current_line:gsub("%^{([^}]+)}", "\\textsuperscript{%1}")
-  current_line = current_line:gsub("%^(%S)", "\\textsuperscript{%1}")
-  current_line = current_line:gsub("\\alert{([^}]*)}", "\\cul{%1}")
-  current_line = current_line:gsub("\\ne", "!=")
-  current_line = current_line:gsub("\\in", "€")
-  current_line = current_line:gsub("\\cup", "U")
-  current_line = current_line:gsub("\\cap", "n")
-  current_line = current_line:gsub("\\subset", "C")
-  current_line = current_line:gsub("\\Phi", "Phi")
-  current_line = current_line:gsub("\\phi", "Phi")
-  current_line = current_line:gsub("\\not", "!")
-  current_line = current_line:gsub("\\emptyset", "\\{\\}")
-  current_line = current_line:gsub("\\equiv", "equiv")
-  current_line = current_line:gsub("\\Rightarrow", "=>")
-  current_line = current_line:gsub("\\rightarrow", "->")
-  current_line = current_line:gsub("\\alpha", "alpha")
-  current_line = current_line:gsub("α", "alpha")
-  current_line = current_line:gsub("\\upnu", "v")
-  current_line = current_line:gsub("\\pi", "pi")
+	-- look for the symbol _ and replace it and the word directly after it by \textsubscript{word}
+	current_line = current_line:gsub("_{([^}]+)}", "\\textsubscript{%1}")
+	current_line = current_line:gsub("_(%S)", "\\textsubscript{%1}")
+	current_line = current_line:gsub("%^{([^}]+)}", "\\textsuperscript{%1}")
+	current_line = current_line:gsub("%^(%S)", "\\textsuperscript{%1}")
+	current_line = current_line:gsub("\\alert{([^}]*)}", "\\cul{%1}")
+	current_line = current_line:gsub("\\ne", "!=")
+	current_line = current_line:gsub("\\in", "€")
+	current_line = current_line:gsub("\\cup", "U")
+	current_line = current_line:gsub("\\cap", "n")
+	current_line = current_line:gsub("\\subset", "C")
+	current_line = current_line:gsub("\\Phi", "Phi")
+	current_line = current_line:gsub("\\phi", "Phi")
+	current_line = current_line:gsub("\\not", "!")
+	current_line = current_line:gsub("\\emptyset", "\\{\\}")
+	current_line = current_line:gsub("\\equiv", "equiv")
+	current_line = current_line:gsub("\\Rightarrow", "=>")
+	current_line = current_line:gsub("\\rightarrow", "->")
+	current_line = current_line:gsub("\\alpha", "alpha")
+	current_line = current_line:gsub("α", "alpha")
+	current_line = current_line:gsub("\\upnu", "v")
+	current_line = current_line:gsub("\\pi", "pi")
 	vim.api.nvim_set_current_line(current_line)
 end
 
@@ -328,6 +328,29 @@ function M.remove_words()
 		line = line:gsub(" " .. v, "")
 	end
 	vim.api.nvim_set_current_line(line)
+end
+
+function M.execute_line()
+	local line = vim.api.nvim_get_current_line()
+	vim.fn.system(line)
+end
+
+function M.open_link()
+	local api = vim.api
+	local bufnr = api.nvim_get_current_buf()
+	local cur_line = api.nvim_win_get_cursor(0)[1]
+
+	for i = cur_line - 1, 1, -1 do
+		local line = api.nvim_buf_get_lines(bufnr, i - 1, i, false)[1]
+		local url = line:match("#%s*.-%s*-%s*(https?://%S+)")
+
+		if url then
+			vim.fn.jobstart({ "xdg-open", url }, { detach = true })
+			return
+		end
+	end
+
+	print("No lecture URL found above cursor.")
 end
 
 return M
