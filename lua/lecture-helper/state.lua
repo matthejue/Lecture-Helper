@@ -19,6 +19,9 @@ M.descs = {
   remove_words = "Removes unneeded words",
   execute_line = "Execute line",
   open_link = "Open link",
+  generate_pdf_and_open = "Generate PDF and open",
+  update_pdf = "Update PDF",
+  convert_line_to_node = "Convert line to mindmap node",
 }
 
 M.subtitles_file_path = ""

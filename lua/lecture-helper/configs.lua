@@ -16,6 +16,9 @@ local default_options = {
 	--  remove_words = "<leader>hR",
 	--  execute_line = "<leader>he",
 	--  open_link = "<leader>hl",
+	--  update_pdf = "<leader>hz",
+  --  generate_pdf_and_open = "<leader>hZ",
+      convert_line_to_node = "<leader>hM",
 	-- },
 	replace_symbols = {
 		["⊔"] = "\\sqcup",
