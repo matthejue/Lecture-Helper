@@ -54,6 +54,21 @@ local function set_commands()
     { desc = state.descs.convert_line_to_node })
   vim.api.nvim_create_user_command("BoldenTimestamedLine", actions.bolden_timestamped_line,
     { desc = state.descs.bolden_timestamped_line })
+  vim.api.nvim_create_user_command("InsertBoxLine", function()
+    actions.insert_box_line(false)
+  end, { desc = state.descs.box_line_primary })
+  vim.api.nvim_create_user_command("InsertBoxBlock", function()
+    actions.insert_box_block(false)
+  end, { desc = state.descs.box_block_primary })
+  vim.api.nvim_create_user_command("InsertAltBoxLine", function()
+    actions.insert_box_line(true)
+  end, { desc = state.descs.box_line_secondary })
+  vim.api.nvim_create_user_command("InsertAltBoxBlock", function()
+    actions.insert_box_block(true)
+  end, { desc = state.descs.box_block_secondary })
+  vim.api.nvim_create_user_command("SetBoxComment", function()
+    actions.set_box_comment()
+  end, { desc = state.descs.box_set_comment })
 end
 
 local function set_global_keybindings()
@@ -210,10 +225,60 @@ local function set_global_keybindings()
       { silent = true, desc = state.descs.bolden_timestamped_line }
     )
   end
+  if state.opts.keys.box_line_primary then
+    vim.keymap.set(
+      "n",
+      state.opts.keys.box_line_primary,
+      function()
+        actions.insert_box_line(false)
+      end,
+      { silent = true, desc = state.descs.box_line_primary }
+    )
+  end
+  if state.opts.keys.box_block_primary then
+    vim.keymap.set(
+      "n",
+      state.opts.keys.box_block_primary,
+      function()
+        actions.insert_box_block(false)
+      end,
+      { silent = true, desc = state.descs.box_block_primary }
+    )
+  end
+  if state.opts.keys.box_line_secondary then
+    vim.keymap.set(
+      "n",
+      state.opts.keys.box_line_secondary,
+      function()
+        actions.insert_box_line(true)
+      end,
+      { silent = true, desc = state.descs.box_line_secondary }
+    )
+  end
+  if state.opts.keys.box_block_secondary then
+    vim.keymap.set(
+      "n",
+      state.opts.keys.box_block_secondary,
+      function()
+        actions.insert_box_block(true)
+      end,
+      { silent = true, desc = state.descs.box_block_secondary }
+    )
+  end
+  if state.opts.keys.box_set_comment then
+    vim.keymap.set(
+      "n",
+      state.opts.keys.box_set_comment,
+      actions.set_box_comment,
+      { silent = true, desc = state.descs.box_set_comment }
+    )
+  end
 end
 
 function M.setup(opts)
+  opts = opts or {}
   state.opts = vim.tbl_deep_extend("keep", opts, configs)
+  state.opts.keys = state.opts.keys or {}
 
   set_commands()
   set_global_keybindings()

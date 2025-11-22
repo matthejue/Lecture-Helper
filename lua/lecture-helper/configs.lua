@@ -1,26 +1,40 @@
 local default_options = {
-	-- keys = {
-	--  current_speech = "<leader>hc",
-	--  update_linenr = "<leader>hu",
-	--  update_timestamp = "<leader>hU",
-	--  previous_speech = "<leader>hp",
-	--  next_speech ="<leader>hn",
-	--  goto_speech = "<leader>hg"
-	--  goto_timestamp = "<leader>ht"
-	--  merge_lines = "M",
-	--  slice_to_line_above = "<leader>hs",
-	--  slice_to_line_below = "<leader>hS",
-	--  remove_slice = "<leader>hd",
-	--  replace_symbols = "<leader>hr"
-	--  convert_textmode = "<leader>hT"
-	--  remove_words = "<leader>hR",
-	--  execute_line = "<leader>he",
-	--  open_link = "<leader>hl",
-	--  update_pdf = "<leader>hz",
-  --  generate_pdf_and_open = "<leader>hZ",
-  -- convert_line_to_node = "<leader>hM",
-  -- bolden_timestamped_line = "<leader>hb",
-	-- },
+	keys = {
+		--  current_speech = "<leader>hc",
+		--  update_linenr = "<leader>hu",
+		--  update_timestamp = "<leader>hU",
+		--  previous_speech = "<leader>hp",
+		--  next_speech ="<leader>hn",
+		--  goto_speech = "<leader>hg"
+		--  goto_timestamp = "<leader>ht"
+		--  merge_lines = "M",
+		--  slice_to_line_above = "<leader>hs",
+		--  slice_to_line_below = "<leader>hS",
+		--  remove_slice = "<leader>hd",
+		--  replace_symbols = "<leader>hr"
+		--  convert_textmode = "<leader>hT"
+		--  remove_words = "<leader>hR",
+		--  execute_line = "<leader>he",
+		--  open_link = "<leader>hl",
+		--  update_pdf = "<leader>hz",
+    --  generate_pdf_and_open = "<leader>hZ",
+    -- convert_line_to_node = "<leader>hM",
+    -- bolden_timestamped_line = "<leader>hb",
+		box_line_primary = "<leader>hBl",
+		box_block_primary = "<leader>hBb",
+		box_line_secondary = "<leader>hBL",
+		box_block_secondary = "<leader>hBB",
+		box_set_comment = "<leader>hBs",
+	},
+	box = {
+		comment = "# ",
+		width = 79,
+		padding = 1,
+		chars = {
+			primary = "-",
+			secondary = "=",
+		},
+	},
 	replace_symbols = {
 		["⊔"] = "\\sqcup",
 		["⊑"] = "\\sqsubseteq",

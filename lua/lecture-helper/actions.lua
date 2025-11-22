@@ -468,4 +468,120 @@ function M.bolden_timestamped_line()
     end
 end
 
+local function build_box_lines(text, fill_char, is_block, prefix_base)
+  local box_opts = state.opts.box or {}
+  local indent = prefix_base or ""
+  local prefix = indent .. (box_opts.comment or "")
+
+  local max_width = box_opts.width or 79
+  local available_width = max_width - #prefix
+  if available_width <= 0 then
+    print("Box width too small for current indent/comment.")
+    return nil, nil
+  end
+
+  local effective_padding = (is_block and 0) or (box_opts.padding or 0)
+  local text_len = #text
+  local padded_len = text_len + effective_padding * 2
+  local content = text
+  if padded_len > available_width then
+    local allow_text = math.max(available_width - effective_padding * 2, 0)
+    content = text:sub(1, allow_text)
+    text_len = #content
+    padded_len = text_len + effective_padding * 2
+    print("Box text trimmed to fit width.")
+  end
+
+  local content_width = available_width
+  local filler = fill_char
+  if not filler or filler == "" then
+    filler = "-"
+  end
+
+  local available = content_width - padded_len
+  local left_fill = math.floor(available / 2)
+  local right_fill = available - left_fill
+
+  local border = prefix .. filler:rep(content_width)
+  local middle
+  if is_block then
+    middle = prefix
+      .. string.rep(" ", left_fill)
+      .. string.rep(" ", effective_padding)
+      .. content
+      .. string.rep(" ", effective_padding)
+      .. string.rep(" ", right_fill)
+  else
+    middle = prefix
+      .. filler:rep(left_fill)
+      .. string.rep(" ", effective_padding)
+      .. content
+      .. string.rep(" ", effective_padding)
+      .. filler:rep(right_fill)
+  end
+
+  local lines
+  if is_block then
+    lines = { border, middle, border }
+  else
+    lines = { middle }
+  end
+
+  local text_col = #prefix + left_fill + effective_padding
+
+  return lines, text_col
+end
+
+local function insert_box(use_secondary, is_block)
+  local text = vim.fn.input("Box text: ")
+  if not text then
+    return
+  end
+  text = text:gsub("^%s*(.-)%s*$", "%1")
+  if text == "" then
+    return
+  end
+
+  local row, col0 = unpack(vim.api.nvim_win_get_cursor(0))
+  local current_line = vim.api.nvim_get_current_line()
+  local prefix_base = current_line:sub(1, col0)
+
+  local box_opts = state.opts.box or {}
+  local chars = box_opts.chars or {}
+  local fill_char = use_secondary and chars.secondary or chars.primary
+
+  local lines, text_col = build_box_lines(text, fill_char, is_block, prefix_base)
+  if not lines then
+    return
+  end
+  local zero_based_row = row - 1
+  if #lines == 1 then
+    vim.api.nvim_buf_set_lines(0, zero_based_row, zero_based_row + 1, false, lines)
+  else
+    vim.api.nvim_buf_set_lines(0, zero_based_row, zero_based_row + 1, false, { lines[1] })
+    vim.api.nvim_buf_set_lines(0, zero_based_row + 1, zero_based_row + 1, false, { lines[2], lines[3] })
+  end
+
+  local target_row = zero_based_row + (#lines == 1 and 1 or 2)
+  vim.api.nvim_win_set_cursor(0, { target_row, text_col })
+end
+
+function M.insert_box_line(use_secondary)
+  insert_box(use_secondary, false)
+end
+
+function M.insert_box_block(use_secondary)
+  insert_box(use_secondary, true)
+end
+
+function M.set_box_comment()
+  local current = state.opts.box and state.opts.box.comment or ""
+  local input = vim.fn.input("Box comment prefix: ", current)
+  if not input or input == "" then
+    return
+  end
+  state.opts.box = state.opts.box or {}
+  state.opts.box.comment = input
+end
+
 return M

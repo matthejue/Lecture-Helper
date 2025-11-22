@@ -23,6 +23,11 @@ M.descs = {
   update_pdf = "Update PDF",
   convert_line_to_node = "Convert line to mindmap node",
   bolden_timestamped_line = "Bolden timestamped line",
+  box_line_primary = "Insert single-line comment box (primary char)",
+  box_block_primary = "Insert 3-line comment box (primary char)",
+  box_line_secondary = "Insert single-line comment box (secondary char)",
+  box_block_secondary = "Insert 3-line comment box (secondary char)",
+  box_set_comment = "Set box comment prefix",
 }
 
 M.subtitles_file_path = ""
