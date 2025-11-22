@@ -22,6 +22,7 @@ M.descs = {
   generate_pdf_and_open = "Generate PDF and open",
   update_pdf = "Update PDF",
   convert_line_to_node = "Convert line to mindmap node",
+  bolden_timestamped_line = "Bolden timestamped line",
 }
 
 M.subtitles_file_path = ""

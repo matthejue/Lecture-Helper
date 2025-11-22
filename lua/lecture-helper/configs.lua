@@ -18,7 +18,8 @@ local default_options = {
 	--  open_link = "<leader>hl",
 	--  update_pdf = "<leader>hz",
   --  generate_pdf_and_open = "<leader>hZ",
-      convert_line_to_node = "<leader>hM",
+  -- convert_line_to_node = "<leader>hM",
+  -- bolden_timestamped_line = "<leader>hb",
 	-- },
 	replace_symbols = {
 		["⊔"] = "\\sqcup",

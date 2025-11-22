@@ -332,7 +332,13 @@ end
 
 function M.execute_line()
   local line = vim.api.nvim_get_current_line()
+
+  local original_cwd = vim.fn.getcwd()
+  local file_dir = vim.fn.expand("%:p:h")
+
+  vim.cmd("lcd " .. vim.fn.fnameescape(file_dir))
   vim.fn.system(line)
+  vim.cmd("lcd " .. vim.fn.fnameescape(original_cwd))
 end
 
 function M.open_link()
@@ -434,6 +440,32 @@ function M.convert_line_to_node()
 
     local row = vim.api.nvim_win_get_cursor(0)[1] - 1
     vim.api.nvim_buf_set_lines(0, row, row + 1, false, new_lines)
+end
+
+function M.bolden_timestamped_line()
+    local line_num = vim.api.nvim_win_get_cursor(0)[1] -- Get current line number
+    local line = vim.api.nvim_buf_get_lines(0, line_num - 1, line_num, false)[1]
+
+    if not line then return end
+
+    -- Check if the line already has bold formatting in the standard format
+    if line:match("^%- %d%d:%d%d:%d%d %*%*(.-)%*%*$") then
+        -- Remove bold formatting from standard format
+        local new_line = line:gsub("(%- %d%d:%d%d:%d%d )%*%*(.-)%*%*", "%1%2")
+        vim.api.nvim_buf_set_lines(0, line_num - 1, line_num, false, { new_line })
+    elseif line:match("^%- %d%d:%d%d:%d%d %.%.%. %*%*(.-)%*%*$") then
+        -- Remove bold formatting from ellipsis format
+        local new_line = line:gsub("(%- %d%d:%d%d:%d%d %.%.%. )%*%*(.-)%*%*", "%1%2")
+        vim.api.nvim_buf_set_lines(0, line_num - 1, line_num, false, { new_line })
+    elseif line:match("^%- %d%d:%d%d:%d%d %.%.%. (.+)$") then
+        -- Add bold formatting for the ellipsis format
+        local new_line = line:gsub("(- %d%d:%d%d:%d%d %.%.%. )(.+)", "%1**%2**")
+        vim.api.nvim_buf_set_lines(0, line_num - 1, line_num, false, { new_line })
+    else
+        -- Add bold formatting for the standard format
+        local new_line = line:gsub("(- %d%d:%d%d:%d%d )(.+)", "%1**%2**")
+        vim.api.nvim_buf_set_lines(0, line_num - 1, line_num, false, { new_line })
+    end
 end
 
 return M
