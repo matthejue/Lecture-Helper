@@ -422,10 +422,10 @@ function M.update_pdf()
 end
 
 function M.convert_line_to_node()
-    local line = vim.api.nvim_get_current_line()
-    if not line or line == "" then
-        print("Invalid input: line is empty or nil.")
-        return
+  local line = vim.api.nvim_get_current_line()
+  if not line or line == "" then
+    print("Invalid input: line is empty or nil.")
+    return
     end
 
     -- Capture leading whitespace for indentation
@@ -438,15 +438,53 @@ function M.convert_line_to_node()
         string.format("%s}", indent),
     }
 
-    local row = vim.api.nvim_win_get_cursor(0)[1] - 1
-    vim.api.nvim_buf_set_lines(0, row, row + 1, false, new_lines)
+  local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+  vim.api.nvim_buf_set_lines(0, row, row + 1, false, new_lines)
+end
+
+function M.convert_lines_to_nodes(start_line, end_line)
+  local mode = vim.fn.mode()
+  local in_visual = mode == "v" or mode == "V" or mode == ""
+
+  if not start_line or not end_line then
+    local start_pos = vim.fn.getpos("'<")
+    local end_pos = vim.fn.getpos("'>")
+    start_line = start_pos[2]
+    end_line = end_pos[2]
+  end
+
+  if start_line > end_line then
+    start_line, end_line = end_line, start_line
+  end
+
+  local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
+  if #lines == 0 then
+    return
+  end
+
+  local new_lines = {}
+  for _, line in ipairs(lines) do
+    local indent = line:match("^(%s*)") or ""
+    local content = line:match("^%s*(.-)%s*$") or ""
+
+    table.insert(new_lines, indent .. "child {")
+    table.insert(new_lines, indent .. "  node {" .. content .. "}")
+    table.insert(new_lines, indent .. "}")
+  end
+
+  vim.api.nvim_buf_set_lines(0, start_line - 1, end_line, false, new_lines)
+
+  if in_visual then
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", true)
+  end
+  vim.api.nvim_win_set_cursor(0, { start_line, 0 })
 end
 
 function M.bolden_timestamped_line()
-    local line_num = vim.api.nvim_win_get_cursor(0)[1] -- Get current line number
-    local line = vim.api.nvim_buf_get_lines(0, line_num - 1, line_num, false)[1]
+  local line_num = vim.api.nvim_win_get_cursor(0)[1] -- Get current line number
+  local line = vim.api.nvim_buf_get_lines(0, line_num - 1, line_num, false)[1]
 
-    if not line then return end
+  if not line then return end
 
     -- Check if the line already has bold formatting in the standard format
     if line:match("^%- %d%d:%d%d:%d%d %*%*(.-)%*%*$") then

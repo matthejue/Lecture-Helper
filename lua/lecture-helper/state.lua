@@ -22,6 +22,7 @@ M.descs = {
   generate_pdf_and_open = "Generate PDF and open",
   update_pdf = "Update PDF",
   convert_line_to_node = "Convert line to mindmap node",
+  convert_lines_to_nodes = "Convert selected lines to mindmap children",
   bolden_timestamped_line = "Bolden timestamped line",
   box_line_primary = "Insert single-line comment box (primary char)",
   box_block_primary = "Insert 3-line comment box (primary char)",

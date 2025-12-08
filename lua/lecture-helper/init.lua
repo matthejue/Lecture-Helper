@@ -52,6 +52,9 @@ local function set_commands()
     { desc = state.descs.update_pdf })
   vim.api.nvim_create_user_command("ConvertLineToNode", actions.convert_line_to_node,
     { desc = state.descs.convert_line_to_node })
+  vim.api.nvim_create_user_command("ConvertLinesToNodes", function(opts)
+    actions.convert_lines_to_nodes(opts.line1, opts.line2)
+  end, { desc = state.descs.convert_lines_to_nodes, range = true })
   vim.api.nvim_create_user_command("BoldenTimestamedLine", actions.bolden_timestamped_line,
     { desc = state.descs.bolden_timestamped_line })
   vim.api.nvim_create_user_command("InsertBoxLine", function()
@@ -215,6 +218,16 @@ local function set_global_keybindings()
       state.opts.keys.convert_line_to_node,
       actions.convert_line_to_node,
       { silent = true, desc = state.descs.convert_line_to_node }
+    )
+  end
+  if state.opts.keys.convert_lines_to_nodes then
+    vim.keymap.set(
+      "v",
+      state.opts.keys.convert_lines_to_nodes,
+      function()
+        actions.convert_lines_to_nodes()
+      end,
+      { silent = true, desc = state.descs.convert_lines_to_nodes }
     )
   end
   if state.opts.keys.bolden_timestamped_line then
