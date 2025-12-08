@@ -55,6 +55,9 @@ local function set_commands()
   vim.api.nvim_create_user_command("ConvertLinesToNodes", function(opts)
     actions.convert_lines_to_nodes(opts.line1, opts.line2)
   end, { desc = state.descs.convert_lines_to_nodes, range = true })
+  vim.api.nvim_create_user_command("RemoveDisturbingPrefix", function(opts)
+    actions.remove_disturbing_prefix(opts.line1, opts.line2)
+  end, { desc = state.descs.remove_disturbing_prefix, range = true })
   vim.api.nvim_create_user_command("BoldenTimestamedLine", actions.bolden_timestamped_line,
     { desc = state.descs.bolden_timestamped_line })
   vim.api.nvim_create_user_command("InsertBoxLine", function()
@@ -228,6 +231,16 @@ local function set_global_keybindings()
         actions.convert_lines_to_nodes()
       end,
       { silent = true, desc = state.descs.convert_lines_to_nodes }
+    )
+  end
+  if state.opts.keys.remove_disturbing_prefix then
+    vim.keymap.set(
+      "v",
+      state.opts.keys.remove_disturbing_prefix,
+      function()
+        actions.remove_disturbing_prefix()
+      end,
+      { silent = true, desc = state.descs.remove_disturbing_prefix }
     )
   end
   if state.opts.keys.bolden_timestamped_line then

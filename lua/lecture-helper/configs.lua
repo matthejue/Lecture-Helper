@@ -25,7 +25,8 @@ local default_options = {
     -- box_line_secondary = "<leader>hBL",
     -- box_block_secondary = "<leader>hBB",
     -- box_set_comment = "<leader>hBs",
-    -- convert_lines_to_nodes = "<leader>hN",
+    convert_lines_to_nodes = "<leader>hN",
+    remove_disturbing_prefix = "<leader>hC",
   },
   box = {
     comment = "# ",
