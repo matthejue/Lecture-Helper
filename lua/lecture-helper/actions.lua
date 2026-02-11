@@ -2,6 +2,28 @@ local state = require("lecture-helper.state")
 
 local M = {}
 
+local function apply_playerctl_position_workaround()
+  if not state.opts.playerctl_position_workaround then
+    return
+  end
+
+  local handle = io.popen("playerctl position 0.000001+")
+  if handle then
+    handle:close()
+  end
+  handle = io.popen("playerctl position 0.000001-")
+  if handle then
+    handle:close()
+  end
+end
+
+local function maybe_lowercase(line)
+  if state.opts.lowercase_inserted_lines then
+    return string.lower(line)
+  end
+  return line
+end
+
 local function set_subtitles_file()
   local basepath = vim.fn.expand("%:p:r")
   local subtitles_file_path = basepath .. ".subtitles"
@@ -22,6 +44,7 @@ local function set_subtitles_file()
 end
 
 local function get_playerctl_position()
+  apply_playerctl_position_workaround()
   local handle = io.popen("playerctl position")
   if not handle then
     return nil, "Failed to get playerctl position"
@@ -85,7 +108,7 @@ function M.current_speech(update_linenr)
   local line
   line, state.line_nr = find_line(timestamp)
   if not update_linenr then
-    vim.api.nvim_set_current_line(state.opts.prefix .. line)
+    vim.api.nvim_set_current_line(maybe_lowercase(state.opts.prefix .. line))
   end
 end
 
@@ -107,7 +130,9 @@ local function insert_lines(n, below)
 
   local insert_lines = {}
   for i = 0, n - 1, 1 do
-    insert_lines[i + 1] = state.opts.prefix .. state.subtitle_file_lines[state.line_nr - (below and n - 1 or 0) + i]
+    insert_lines[i + 1] = maybe_lowercase(
+      state.opts.prefix .. state.subtitle_file_lines[state.line_nr - (below and n - 1 or 0) + i]
+    )
   end
 
   vim.api.nvim_buf_set_lines(bufnr, cline + (below and 1 or 0), cline + (below and 1 or 0), false, insert_lines)
@@ -224,6 +249,7 @@ function M.goto_speech()
   local line = vim.api.nvim_get_current_line()
   local hours, minutes, seconds = line:match("(%d+):(%d+):(%d+)")
   seconds = timestamp_to_seconds(hours, minutes, seconds)
+  apply_playerctl_position_workaround()
   local handle = io.popen("playerctl position " .. seconds)
   if not handle then
     return nil, "Failed to set playerctl position"

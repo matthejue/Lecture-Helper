@@ -96,6 +96,8 @@ local default_options = {
     "sorry",
     "well",
   },
+  -- playerctl_position_workaround = true,
+  -- lowercase_inserted_lines = true,
 }
 
 return default_options
