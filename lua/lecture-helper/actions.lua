@@ -1,6 +1,7 @@
 local state = require("lecture-helper.state")
 
 local M = {}
+local PLAYERCTL_POSITION_WORKAROUND_WAIT_MS = 50
 
 local function apply_playerctl_position_workaround()
   if not state.opts.playerctl_position_workaround then
@@ -11,10 +12,12 @@ local function apply_playerctl_position_workaround()
   if handle then
     handle:close()
   end
+  vim.wait(PLAYERCTL_POSITION_WORKAROUND_WAIT_MS)
   handle = io.popen("playerctl position 0.000001-")
   if handle then
     handle:close()
   end
+  vim.wait(PLAYERCTL_POSITION_WORKAROUND_WAIT_MS)
 end
 
 local function maybe_lowercase(line)
@@ -249,7 +252,6 @@ function M.goto_speech()
   local line = vim.api.nvim_get_current_line()
   local hours, minutes, seconds = line:match("(%d+):(%d+):(%d+)")
   seconds = timestamp_to_seconds(hours, minutes, seconds)
-  apply_playerctl_position_workaround()
   local handle = io.popen("playerctl position " .. seconds)
   if not handle then
     return nil, "Failed to set playerctl position"
