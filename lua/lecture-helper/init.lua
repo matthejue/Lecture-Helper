@@ -47,6 +47,11 @@ local function set_commands()
   vim.api.nvim_create_user_command("RemoveWords", actions.remove_words, { desc = state.descs.remove_words })
   vim.api.nvim_create_user_command("ExecuteLine", actions.execute_line, { desc = state.descs.execute_line })
   vim.api.nvim_create_user_command(
+    "OpenImageFromImgTag",
+    actions.open_image_from_img_tag,
+    { desc = state.descs.open_image_from_img_tag }
+  )
+  vim.api.nvim_create_user_command(
     "PreviewYoutubeTimestampFrame",
     actions.preview_youtube_timestamp_frame,
     { desc = state.descs.preview_youtube_timestamp_frame }
@@ -202,6 +207,14 @@ local function set_global_keybindings()
       state.opts.keys.open_link,
       actions.open_link,
       { silent = true, desc = state.descs.open_link }
+    )
+  end
+  if state.opts.keys.open_image_from_img_tag then
+    vim.keymap.set(
+      "n",
+      state.opts.keys.open_image_from_img_tag,
+      actions.open_image_from_img_tag,
+      { silent = true, desc = state.descs.open_image_from_img_tag }
     )
   end
   if state.opts.keys.preview_youtube_timestamp_frame then

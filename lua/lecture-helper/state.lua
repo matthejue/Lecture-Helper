@@ -19,6 +19,7 @@ M.descs = {
   remove_words = "Removes unneeded words",
   execute_line = "Execute line",
   open_link = "Open link",
+  open_image_from_img_tag = "Open image from <img src=\"...\"> on current line",
   preview_youtube_timestamp_frame = "Preview youtube frame at timestamp",
   generate_pdf_and_open = "Generate PDF and open",
   update_pdf = "Update PDF",

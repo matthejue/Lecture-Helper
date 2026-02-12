@@ -16,6 +16,7 @@ local default_options = {
     --  remove_words = "<leader>hR",
     --  execute_line = "<leader>he",
     --  open_link = "<leader>hl",
+    -- open_image_from_img_tag = "<leader>hI",
     --  preview_youtube_timestamp_frame = "<leader>hh",
     --  update_pdf = "<leader>hz",
     --  generate_pdf_and_open = "<leader>hZ",

@@ -387,6 +387,41 @@ function M.open_link()
   print("No lecture URL found above cursor.")
 end
 
+function M.open_image_from_img_tag()
+  local line = vim.api.nvim_get_current_line()
+  local image_path = line:match('<img%s+.-src%s*=%s*"([^"]+)"')
+    or line:match("<img%s+.-src%s*=%s*'([^']+)'")
+
+  if not image_path then
+    print('No image src path found on current line (expected <img ... src="...">).')
+    return
+  end
+
+  local expanded_path = vim.fn.expand(image_path)
+  if not expanded_path:match("^/") then
+    local file_dir = vim.fn.expand("%:p:h")
+    expanded_path = file_dir .. "/" .. expanded_path
+  end
+  expanded_path = vim.fn.fnamemodify(expanded_path, ":p")
+
+  if vim.fn.filereadable(expanded_path) ~= 1 then
+    print("Image file not found: " .. expanded_path)
+    return
+  end
+
+  local viewer = (state.opts.youtube_preview and state.opts.youtube_preview.viewer) or "nsxiv"
+  local cmd = vim.split(viewer, "%s+")
+  if #cmd == 0 or not cmd[1] or cmd[1] == "" then
+    cmd = { "nsxiv" }
+  end
+
+  table.insert(cmd, expanded_path)
+  local job_id = vim.fn.jobstart(cmd, { detach = true })
+  if job_id <= 0 then
+    print("Failed to open image with viewer: " .. viewer)
+  end
+end
+
 local function get_timestamp_from_line(line)
   local h, m, s = line:match("(%d+):(%d+):(%d+)")
   if not h then
