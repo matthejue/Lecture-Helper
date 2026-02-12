@@ -91,7 +91,6 @@ local default_options = {
   prefix = "", -- "- "
   youtube_preview = {
     viewer = "nsxiv",
-    cache_dir = "/tmp/lecture-helper-youtube-frames",
   },
   unneeded_words = {
     "uh",
