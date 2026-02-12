@@ -387,6 +387,115 @@ function M.open_link()
   print("No lecture URL found above cursor.")
 end
 
+local function get_timestamp_from_line(line)
+  local h, m, s = line:match("(%d+):(%d+):(%d+)")
+  if not h then
+    return nil
+  end
+
+  return string.format("%02d:%02d:%02d", tonumber(h), tonumber(m), tonumber(s))
+end
+
+local function find_youtube_url(bufnr, cur_line)
+  for i = cur_line - 1, 1, -1 do
+    local line = vim.api.nvim_buf_get_lines(bufnr, i - 1, i, false)[1]
+    local url = line:match("xdg%-open%s+(https?://%S+)")
+    if url then
+      return url
+    end
+  end
+
+  local total = vim.api.nvim_buf_line_count(bufnr)
+  for i = cur_line + 1, total do
+    local line = vim.api.nvim_buf_get_lines(bufnr, i - 1, i, false)[1]
+    local url = line:match("xdg%-open%s+(https?://%S+)")
+    if url then
+      return url
+    end
+  end
+
+  return nil
+end
+
+local function get_script_dir()
+  local src = debug.getinfo(1, "S").source
+  if src:sub(1, 1) == "@" then
+    src = src:sub(2)
+  end
+  return vim.fn.fnamemodify(src, ":h")
+end
+
+local function sanitize_cache_name(name)
+  local normalized = name:gsub("%.[^%.]+$", "")
+  normalized = normalized:gsub("[^%w%-%._]", "_")
+  if normalized == "" then
+    return "buffer"
+  end
+  return normalized
+end
+
+function M.preview_youtube_timestamp_frame()
+  local line = vim.api.nvim_get_current_line()
+  local timestamp = get_timestamp_from_line(line)
+  if not timestamp then
+    print("Current line has no timestamp (expected hh:mm:ss).")
+    return
+  end
+
+  local bufnr = vim.api.nvim_get_current_buf()
+  local cur_line = vim.api.nvim_win_get_cursor(0)[1]
+  local url = find_youtube_url(bufnr, cur_line)
+  if not url then
+    print("No youtube URL found in xdg-open lines around cursor.")
+    return
+  end
+
+  local script_path = get_script_dir() .. "/scripts/youtube_timestamp_preview.py"
+  if vim.fn.filereadable(script_path) ~= 1 then
+    print("Preview script not found: " .. script_path)
+    return
+  end
+
+  local preview_opts = state.opts.youtube_preview or {}
+  local viewer = preview_opts.viewer or "nsxiv"
+  local file_dir = vim.fn.expand("%:p:h")
+  local file_name = vim.fn.expand("%:t")
+  local cache_dir = file_dir .. "/.frames/" .. sanitize_cache_name(file_name)
+
+  local cmd = {
+    "python3",
+    script_path,
+    "--url",
+    url,
+    "--timestamp",
+    timestamp,
+    "--viewer",
+    viewer,
+    "--cache-dir",
+    cache_dir,
+  }
+
+  vim.fn.jobstart(cmd, {
+    stdout_buffered = true,
+    stderr_buffered = true,
+    on_stderr = function(_, data)
+      if not data then
+        return
+      end
+      for _, line_text in ipairs(data) do
+        if line_text and line_text ~= "" then
+          print(line_text)
+        end
+      end
+    end,
+    on_exit = function(_, code)
+      if code ~= 0 then
+        print("Failed to preview timestamp frame.")
+      end
+    end,
+  })
+end
+
 local current_file_path = nil
 local current_output_pdf = nil
 local zathura_handle = nil

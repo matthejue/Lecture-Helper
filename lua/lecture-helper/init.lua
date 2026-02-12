@@ -46,6 +46,11 @@ local function set_commands()
   )
   vim.api.nvim_create_user_command("RemoveWords", actions.remove_words, { desc = state.descs.remove_words })
   vim.api.nvim_create_user_command("ExecuteLine", actions.execute_line, { desc = state.descs.execute_line })
+  vim.api.nvim_create_user_command(
+    "PreviewYoutubeTimestampFrame",
+    actions.preview_youtube_timestamp_frame,
+    { desc = state.descs.preview_youtube_timestamp_frame }
+  )
   vim.api.nvim_create_user_command("GeneratePdfAndOpen", actions.generate_pdf_and_open,
     { desc = state.descs.generate_pdf_and_open })
   vim.api.nvim_create_user_command("UpdatePDF", actions.update_pdf,
@@ -197,6 +202,14 @@ local function set_global_keybindings()
       state.opts.keys.open_link,
       actions.open_link,
       { silent = true, desc = state.descs.open_link }
+    )
+  end
+  if state.opts.keys.preview_youtube_timestamp_frame then
+    vim.keymap.set(
+      "n",
+      state.opts.keys.preview_youtube_timestamp_frame,
+      actions.preview_youtube_timestamp_frame,
+      { silent = true, desc = state.descs.preview_youtube_timestamp_frame }
     )
   end
   if state.opts.keys.generate_pdf_and_open then

@@ -16,6 +16,7 @@ local default_options = {
     --  remove_words = "<leader>hR",
     --  execute_line = "<leader>he",
     --  open_link = "<leader>hl",
+    --  preview_youtube_timestamp_frame = "<leader>hh",
     --  update_pdf = "<leader>hz",
     --  generate_pdf_and_open = "<leader>hZ",
     -- convert_line_to_node = "<leader>hM",
@@ -88,6 +89,10 @@ local default_options = {
     ["4%."] = "\\item",
   },
   prefix = "", -- "- "
+  youtube_preview = {
+    viewer = "nsxiv",
+    cache_dir = "/tmp/lecture-helper-youtube-frames",
+  },
   unneeded_words = {
     "uh",
     "oh",
