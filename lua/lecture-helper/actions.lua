@@ -1,7 +1,7 @@
 local state = require("lecture-helper.state")
 
 local M = {}
-local PLAYERCTL_POSITION_WORKAROUND_WAIT_MS = 50
+local PLAYERCTL_POSITION_WORKAROUND_WAIT_MS = 150
 
 local function apply_playerctl_position_workaround()
   if not state.opts.playerctl_position_workaround then
