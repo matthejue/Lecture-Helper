@@ -59,8 +59,10 @@ local function set_subtitles_file()
   subtitle_file:close()
 end
 
-local function get_playerctl_position()
-  apply_playerctl_position_workaround()
+local function get_playerctl_position(skip_workaround)
+  if not skip_workaround then
+    apply_playerctl_position_workaround()
+  end
   local handle = io.popen("playerctl position")
   if not handle then
     return nil, "Failed to get playerctl position"
@@ -511,7 +513,7 @@ function M.follow_video_timestamp_once()
     return
   end
 
-  local current_timestamp = get_playerctl_position()
+  local current_timestamp = get_playerctl_position(true)
   if not current_timestamp then
     return
   end
