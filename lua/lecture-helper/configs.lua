@@ -18,6 +18,7 @@ local default_options = {
     --  open_link = "<leader>hl",
     -- open_image_from_img_tag = "<leader>hI",
     --  preview_youtube_timestamp_frame = "<leader>hh",
+    --  toggle_timestamp_frame_autopreview = "<leader>ha",
     --  update_pdf = "<leader>hz",
     --  generate_pdf_and_open = "<leader>hZ",
     -- convert_line_to_node = "<leader>hM",

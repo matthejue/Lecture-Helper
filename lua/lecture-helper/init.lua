@@ -56,6 +56,11 @@ local function set_commands()
     actions.preview_youtube_timestamp_frame,
     { desc = state.descs.preview_youtube_timestamp_frame }
   )
+  vim.api.nvim_create_user_command(
+    "ToggleTimestampFrameAutopreview",
+    actions.toggle_timestamp_frame_autopreview,
+    { desc = state.descs.toggle_timestamp_frame_autopreview }
+  )
   vim.api.nvim_create_user_command("GeneratePdfAndOpen", actions.generate_pdf_and_open,
     { desc = state.descs.generate_pdf_and_open })
   vim.api.nvim_create_user_command("UpdatePDF", actions.update_pdf,
@@ -223,6 +228,14 @@ local function set_global_keybindings()
       state.opts.keys.preview_youtube_timestamp_frame,
       actions.preview_youtube_timestamp_frame,
       { silent = true, desc = state.descs.preview_youtube_timestamp_frame }
+    )
+  end
+  if state.opts.keys.toggle_timestamp_frame_autopreview then
+    vim.keymap.set(
+      "n",
+      state.opts.keys.toggle_timestamp_frame_autopreview,
+      actions.toggle_timestamp_frame_autopreview,
+      { silent = true, desc = state.descs.toggle_timestamp_frame_autopreview }
     )
   end
   if state.opts.keys.generate_pdf_and_open then

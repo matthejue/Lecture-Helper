@@ -2,6 +2,16 @@ local state = require("lecture-helper.state")
 
 local M = {}
 local PLAYERCTL_POSITION_WORKAROUND_WAIT_MS = 150
+local TIMESTAMP_FRAME_AUTOPREVIEW_GROUP = vim.api.nvim_create_augroup(
+  "LectureHelperTimestampFrameAutopreview",
+  { clear = false }
+)
+local TIMESTAMP_FRAME_AUTOPREVIEW_TMP_DIR = "/tmp/lecture_helper"
+local TIMESTAMP_FRAME_AUTOPREVIEW_IMG = TIMESTAMP_FRAME_AUTOPREVIEW_TMP_DIR .. "/current.png"
+local TIMESTAMP_FRAME_AUTOPREVIEW_LOCK = TIMESTAMP_FRAME_AUTOPREVIEW_TMP_DIR .. "/nsxiv.lock"
+local timestamp_frame_autopreview_autocmd_id = nil
+local timestamp_frame_autopreview_last_line_by_buf = {}
+local timestamp_frame_autopreview_viewer_job_id = nil
 
 local function apply_playerctl_position_workaround()
   if not state.opts.playerctl_position_workaround then
@@ -469,6 +479,121 @@ local function sanitize_cache_name(name)
   return normalized
 end
 
+local function timestamp_to_filename(timestamp)
+  return timestamp:gsub(":", "-") .. ".png"
+end
+
+local function get_timestamp_frame_path(bufnr, timestamp)
+  local buffer_path = vim.api.nvim_buf_get_name(bufnr)
+  if buffer_path == "" then
+    return nil
+  end
+
+  local file_dir = vim.fn.fnamemodify(buffer_path, ":h")
+  local file_name = vim.fn.fnamemodify(buffer_path, ":t")
+  local cache_dir = file_dir .. "/.frames/" .. sanitize_cache_name(file_name)
+  return cache_dir .. "/" .. timestamp_to_filename(timestamp)
+end
+
+local function ensure_timestamp_preview_tmp_dir()
+  vim.fn.mkdir(TIMESTAMP_FRAME_AUTOPREVIEW_TMP_DIR, "p")
+  return vim.fn.isdirectory(TIMESTAMP_FRAME_AUTOPREVIEW_TMP_DIR) == 1
+end
+
+local function remove_autopreview_lock()
+  if vim.fn.filereadable(TIMESTAMP_FRAME_AUTOPREVIEW_LOCK) == 1 then
+    vim.fn.delete(TIMESTAMP_FRAME_AUTOPREVIEW_LOCK)
+  end
+end
+
+local function is_pid_running(pid)
+  if not pid or pid <= 0 then
+    return false
+  end
+
+  vim.fn.system({ "kill", "-0", tostring(pid) })
+  return vim.v.shell_error == 0
+end
+
+local function is_autopreview_viewer_running()
+  if timestamp_frame_autopreview_viewer_job_id then
+    local status = vim.fn.jobwait({ timestamp_frame_autopreview_viewer_job_id }, 0)[1]
+    if status == -1 then
+      return true
+    end
+    timestamp_frame_autopreview_viewer_job_id = nil
+  end
+
+  if vim.fn.filereadable(TIMESTAMP_FRAME_AUTOPREVIEW_LOCK) == 1 then
+    local lines = vim.fn.readfile(TIMESTAMP_FRAME_AUTOPREVIEW_LOCK)
+    local pid = tonumber(lines[1] or "")
+    if is_pid_running(pid) then
+      return true
+    end
+    remove_autopreview_lock()
+  end
+
+  return false
+end
+
+local function maybe_open_autopreview_viewer()
+  if is_autopreview_viewer_running() then
+    return
+  end
+
+  local job_id = vim.fn.jobstart({ "nsxiv", TIMESTAMP_FRAME_AUTOPREVIEW_IMG }, {
+    on_exit = function()
+      timestamp_frame_autopreview_viewer_job_id = nil
+      remove_autopreview_lock()
+    end,
+  })
+
+  if job_id <= 0 then
+    print("Failed to open nsxiv for timestamp autopreview.")
+    return
+  end
+
+  timestamp_frame_autopreview_viewer_job_id = job_id
+  local pid = vim.fn.jobpid(job_id)
+  if pid and pid > 0 then
+    vim.fn.writefile({ tostring(pid) }, TIMESTAMP_FRAME_AUTOPREVIEW_LOCK)
+  end
+end
+
+local function update_autopreview_image(bufnr, row)
+  if vim.bo[bufnr].buftype ~= "" then
+    return
+  end
+
+  local line = vim.api.nvim_buf_get_lines(bufnr, row - 1, row, false)[1] or ""
+  local timestamp = get_timestamp_from_line(line)
+  if not timestamp then
+    return
+  end
+
+  local frame_path = get_timestamp_frame_path(bufnr, timestamp)
+  if not frame_path or vim.fn.filereadable(frame_path) ~= 1 then
+    return
+  end
+
+  if not ensure_timestamp_preview_tmp_dir() then
+    print("Failed to create directory: " .. TIMESTAMP_FRAME_AUTOPREVIEW_TMP_DIR)
+    return
+  end
+
+  if vim.fn.filereadable(TIMESTAMP_FRAME_AUTOPREVIEW_IMG) == 1 then
+    vim.fn.delete(TIMESTAMP_FRAME_AUTOPREVIEW_IMG)
+  end
+
+  local ok, err = vim.loop.fs_copyfile(frame_path, TIMESTAMP_FRAME_AUTOPREVIEW_IMG)
+  if not ok then
+    print("Failed to copy image to " .. TIMESTAMP_FRAME_AUTOPREVIEW_IMG .. ": " .. (err or "unknown error"))
+    return
+  end
+
+  maybe_open_autopreview_viewer()
+end
+
 function M.preview_youtube_timestamp_frame()
   local line = vim.api.nvim_get_current_line()
   local timestamp = get_timestamp_from_line(line)
@@ -529,6 +654,31 @@ function M.preview_youtube_timestamp_frame()
       end
     end,
   })
+end
+
+function M.toggle_timestamp_frame_autopreview()
+  if timestamp_frame_autopreview_autocmd_id then
+    vim.api.nvim_del_autocmd(timestamp_frame_autopreview_autocmd_id)
+    timestamp_frame_autopreview_autocmd_id = nil
+    timestamp_frame_autopreview_last_line_by_buf = {}
+    print("Timestamp frame autocheck disabled.")
+    return
+  end
+
+  timestamp_frame_autopreview_autocmd_id = vim.api.nvim_create_autocmd("CursorMoved", {
+    group = TIMESTAMP_FRAME_AUTOPREVIEW_GROUP,
+    callback = function(ev)
+      local row = vim.api.nvim_win_get_cursor(0)[1]
+      if timestamp_frame_autopreview_last_line_by_buf[ev.buf] == row then
+        return
+      end
+
+      timestamp_frame_autopreview_last_line_by_buf[ev.buf] = row
+      update_autopreview_image(ev.buf, row)
+    end,
+  })
+
+  print("Timestamp frame autocheck enabled.")
 end
 
 local current_file_path = nil
