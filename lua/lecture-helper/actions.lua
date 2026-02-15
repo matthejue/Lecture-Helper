@@ -12,7 +12,8 @@ local TIMESTAMP_FRAME_AUTOPREVIEW_LOCK = TIMESTAMP_FRAME_AUTOPREVIEW_TMP_DIR .. 
 local timestamp_frame_autopreview_autocmd_id = nil
 local timestamp_frame_autopreview_last_line_by_buf = {}
 local timestamp_frame_autopreview_viewer_job_id = nil
-local VIDEO_TIMESTAMP_FOLLOW_INTERVAL_SECONDS = 5
+local VIDEO_TIMESTAMP_FOLLOW_INTERVAL_SECONDS = 10
+local FOLLOW_VIDEO_TIMESTAMP_ONCE_SKIP_PLAYERCTL_WORKAROUND = false
 local video_timestamp_follow_timer = nil
 local video_timestamp_follow_last_line_by_buf = {}
 
@@ -513,7 +514,7 @@ function M.follow_video_timestamp_once()
     return
   end
 
-  local current_timestamp = get_playerctl_position(true)
+  local current_timestamp = get_playerctl_position(FOLLOW_VIDEO_TIMESTAMP_ONCE_SKIP_PLAYERCTL_WORKAROUND)
   if not current_timestamp then
     return
   end
@@ -535,7 +536,10 @@ function M.follow_video_timestamp_once()
   end
   video_timestamp_follow_last_line_by_buf[bufnr] = line_nr
 
-  pcall(vim.api.nvim_win_set_cursor, 0, { line_nr, 0 })
+  local ok = pcall(vim.api.nvim_win_set_cursor, 0, { line_nr, 0 })
+  if ok then
+    vim.cmd("normal! zz")
+  end
 end
 
 function M.goto_current_video_timestamp_line()
