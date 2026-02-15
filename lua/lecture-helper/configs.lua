@@ -19,6 +19,8 @@ local default_options = {
     -- open_image_from_img_tag = "<leader>hI",
     --  preview_youtube_timestamp_frame = "<leader>hh",
     --  toggle_timestamp_frame_autopreview = "<leader>ha",
+    -- toggle_video_timestamp_follow = "<leader>hf",
+    -- goto_current_video_timestamp_line = "<leader>hF",
     --  update_pdf = "<leader>hz",
     --  generate_pdf_and_open = "<leader>hZ",
     -- convert_line_to_node = "<leader>hM",
@@ -94,6 +96,7 @@ local default_options = {
   youtube_preview = {
     viewer = "nsxiv",
   },
+  video_timestamp_follow_interval_seconds = 5,
   unneeded_words = {
     "uh",
     "oh",

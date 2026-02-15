@@ -22,6 +22,8 @@ M.descs = {
   open_image_from_img_tag = "Open image from <img src=\"...\"> on current line",
   preview_youtube_timestamp_frame = "Preview youtube frame at timestamp",
   toggle_timestamp_frame_autopreview = "Toggle auto-copy/open cached timestamp frame on line move",
+  toggle_video_timestamp_follow = "Toggle following the video timestamp in the current file",
+  goto_current_video_timestamp_line = "Jump to current video timestamp line once",
   generate_pdf_and_open = "Generate PDF and open",
   update_pdf = "Update PDF",
   convert_line_to_node = "Convert line to mindmap node",

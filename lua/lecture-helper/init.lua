@@ -61,6 +61,16 @@ local function set_commands()
     actions.toggle_timestamp_frame_autopreview,
     { desc = state.descs.toggle_timestamp_frame_autopreview }
   )
+  vim.api.nvim_create_user_command(
+    "ToggleVideoTimestampFollow",
+    actions.toggle_video_timestamp_follow,
+    { desc = state.descs.toggle_video_timestamp_follow }
+  )
+  vim.api.nvim_create_user_command(
+    "GotoCurrentVideoTimestampLine",
+    actions.goto_current_video_timestamp_line,
+    { desc = state.descs.goto_current_video_timestamp_line }
+  )
   vim.api.nvim_create_user_command("GeneratePdfAndOpen", actions.generate_pdf_and_open,
     { desc = state.descs.generate_pdf_and_open })
   vim.api.nvim_create_user_command("UpdatePDF", actions.update_pdf,
@@ -236,6 +246,22 @@ local function set_global_keybindings()
       state.opts.keys.toggle_timestamp_frame_autopreview,
       actions.toggle_timestamp_frame_autopreview,
       { silent = true, desc = state.descs.toggle_timestamp_frame_autopreview }
+    )
+  end
+  if state.opts.keys.toggle_video_timestamp_follow then
+    vim.keymap.set(
+      "n",
+      state.opts.keys.toggle_video_timestamp_follow,
+      actions.toggle_video_timestamp_follow,
+      { silent = true, desc = state.descs.toggle_video_timestamp_follow }
+    )
+  end
+  if state.opts.keys.goto_current_video_timestamp_line then
+    vim.keymap.set(
+      "n",
+      state.opts.keys.goto_current_video_timestamp_line,
+      actions.goto_current_video_timestamp_line,
+      { silent = true, desc = state.descs.goto_current_video_timestamp_line }
     )
   end
   if state.opts.keys.generate_pdf_and_open then

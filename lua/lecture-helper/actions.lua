@@ -12,6 +12,9 @@ local TIMESTAMP_FRAME_AUTOPREVIEW_LOCK = TIMESTAMP_FRAME_AUTOPREVIEW_TMP_DIR .. 
 local timestamp_frame_autopreview_autocmd_id = nil
 local timestamp_frame_autopreview_last_line_by_buf = {}
 local timestamp_frame_autopreview_viewer_job_id = nil
+local VIDEO_TIMESTAMP_FOLLOW_INTERVAL_SECONDS = 5
+local video_timestamp_follow_timer = nil
+local video_timestamp_follow_last_line_by_buf = {}
 
 local function apply_playerctl_position_workaround()
   if not state.opts.playerctl_position_workaround then
@@ -468,6 +471,104 @@ local function get_script_dir()
     src = src:sub(2)
   end
   return vim.fn.fnamemodify(src, ":h")
+end
+
+local function get_video_timestamp_follow_line(script_path, file_path, current_timestamp)
+  local cmd = {
+    "python3",
+    script_path,
+    "--file",
+    file_path,
+    "--current-time",
+    current_timestamp,
+  }
+  local output = vim.fn.systemlist(cmd)
+  if vim.v.shell_error ~= 0 or #output == 0 then
+    return nil
+  end
+
+  return tonumber(output[1])
+end
+
+local function get_video_timestamp_follow_interval_ms()
+  local seconds = tonumber(state.opts.video_timestamp_follow_interval_seconds)
+    or VIDEO_TIMESTAMP_FOLLOW_INTERVAL_SECONDS
+  if seconds <= 0 then
+    seconds = VIDEO_TIMESTAMP_FOLLOW_INTERVAL_SECONDS
+  end
+
+  return math.floor(seconds * 1000)
+end
+
+function M.follow_video_timestamp_once()
+  local bufnr = vim.api.nvim_get_current_buf()
+  if vim.bo[bufnr].buftype ~= "" then
+    return
+  end
+
+  local file_path = vim.api.nvim_buf_get_name(bufnr)
+  if file_path == "" or vim.fn.filereadable(file_path) ~= 1 then
+    return
+  end
+
+  local current_timestamp = get_playerctl_position()
+  if not current_timestamp then
+    return
+  end
+
+  local script_path = get_script_dir() .. "/scripts/find_latest_timestamp_line.py"
+  if vim.fn.filereadable(script_path) ~= 1 then
+    return
+  end
+
+  local line_nr = get_video_timestamp_follow_line(script_path, file_path, current_timestamp)
+  if not line_nr or line_nr < 1 then
+    return
+  end
+
+  local max_line = vim.api.nvim_buf_line_count(bufnr)
+  line_nr = math.min(line_nr, max_line)
+  if video_timestamp_follow_last_line_by_buf[bufnr] == line_nr then
+    return
+  end
+  video_timestamp_follow_last_line_by_buf[bufnr] = line_nr
+
+  pcall(vim.api.nvim_win_set_cursor, 0, { line_nr, 0 })
+end
+
+function M.goto_current_video_timestamp_line()
+  M.follow_video_timestamp_once()
+end
+
+function M.toggle_video_timestamp_follow()
+  if video_timestamp_follow_timer then
+    video_timestamp_follow_timer:stop()
+    video_timestamp_follow_timer:close()
+    video_timestamp_follow_timer = nil
+    video_timestamp_follow_last_line_by_buf = {}
+    print("Video timestamp follow disabled.")
+    return
+  end
+
+  local script_path = get_script_dir() .. "/scripts/find_latest_timestamp_line.py"
+  if vim.fn.filereadable(script_path) ~= 1 then
+    print("Timestamp follow script not found: " .. script_path)
+    return
+  end
+
+  local interval_ms = get_video_timestamp_follow_interval_ms()
+  video_timestamp_follow_timer = vim.loop.new_timer()
+  video_timestamp_follow_timer:start(
+    0,
+    interval_ms,
+    vim.schedule_wrap(function()
+      if video_timestamp_follow_timer then
+        M.follow_video_timestamp_once()
+      end
+    end)
+  )
+
+  print("Video timestamp follow enabled.")
 end
 
 local function sanitize_cache_name(name)
