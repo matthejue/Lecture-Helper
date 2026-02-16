@@ -524,7 +524,7 @@ local function get_video_timestamp_follow_interval_ms()
   return math.floor(seconds * 1000)
 end
 
-function M.follow_video_timestamp_once()
+function M.follow_video_timestamp_once(force_jump)
   local bufnr = vim.api.nvim_get_current_buf()
   if vim.bo[bufnr].buftype ~= "" then
     return
@@ -552,7 +552,7 @@ function M.follow_video_timestamp_once()
 
   local max_line = vim.api.nvim_buf_line_count(bufnr)
   line_nr = math.min(line_nr, max_line)
-  if video_timestamp_follow_last_line_by_buf[bufnr] == line_nr then
+  if not force_jump and video_timestamp_follow_last_line_by_buf[bufnr] == line_nr then
     return
   end
   video_timestamp_follow_last_line_by_buf[bufnr] = line_nr
@@ -564,7 +564,7 @@ function M.follow_video_timestamp_once()
 end
 
 function M.goto_current_video_timestamp_line()
-  M.follow_video_timestamp_once()
+  M.follow_video_timestamp_once(true)
 end
 
 function M.toggle_video_timestamp_follow()
