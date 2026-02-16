@@ -142,6 +142,27 @@ function M.update_timestamp()
   vim.api.nvim_set_current_line(line)
 end
 
+function M.insert_playerctl_timestamp_line()
+  local timestamp, err = get_playerctl_position()
+  if not timestamp then
+    print("Error: " .. err)
+    return
+  end
+
+  local line = vim.api.nvim_get_current_line()
+  local suffix = "- " .. timestamp .. " "
+  local separator = ""
+  if line ~= "" and not line:match("%s$") then
+    separator = " "
+  end
+
+  local new_line = line .. separator .. suffix
+  vim.api.nvim_set_current_line(new_line)
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  vim.api.nvim_win_set_cursor(0, { row, #new_line })
+  vim.cmd("startinsert!")
+end
+
 local function insert_lines(n, below)
   local bufnr = vim.api.nvim_get_current_buf()
   local cursor_pos = vim.api.nvim_win_get_cursor(0)

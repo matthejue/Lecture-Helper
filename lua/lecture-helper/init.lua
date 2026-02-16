@@ -18,6 +18,11 @@ local function set_commands()
     actions.update_timestamp,
     { desc = state.descs.update_timestamp }
   )
+  vim.api.nvim_create_user_command(
+    "InsertPlayerctlTimestampLine",
+    actions.insert_playerctl_timestamp_line,
+    { desc = state.descs.insert_playerctl_timestamp_line }
+  )
   vim.api.nvim_create_user_command("PreviousSpeech", function(arg)
     actions.previous_speech(tonumber(arg.args))
   end, { desc = state.descs.previous_speech, nargs = "?" })
@@ -124,6 +129,14 @@ local function set_global_keybindings()
       state.opts.keys.update_timestamp,
       actions.update_timestamp,
       { silent = true, desc = state.descs.update_timestamp }
+    )
+  end
+  if state.opts.keys.insert_playerctl_timestamp_line then
+    vim.keymap.set(
+      "n",
+      state.opts.keys.insert_playerctl_timestamp_line,
+      actions.insert_playerctl_timestamp_line,
+      { silent = true, desc = state.descs.insert_playerctl_timestamp_line }
     )
   end
   if state.opts.keys.previous_speech then

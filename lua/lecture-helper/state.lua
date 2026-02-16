@@ -6,6 +6,7 @@ M.descs = {
   current_speech = "Get current speech from video",
   update_linenr = "Updates current line to current timetsamp",
   update_timestamp = "Updates timestamp to current timestamp",
+  insert_playerctl_timestamp_line = "Insert '- hh:mm:ss' using current playerctl position",
   previous_speech = "Get previous speech from video",
   next_speech = "Get next speech from video",
   merge_lines = "Merge newly inserted lines",

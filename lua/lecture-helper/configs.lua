@@ -3,6 +3,7 @@ local default_options = {
     --  current_speech = "<leader>hc",
     --  update_linenr = "<leader>hu",
     --  update_timestamp = "<leader>hU",
+    -- insert_playerctl_timestamp_line = "<leader>hC",
     --  previous_speech = "<leader>hp",
     --  next_speech ="<leader>hn",
     --  goto_speech = "<leader>hg"
@@ -31,7 +32,7 @@ local default_options = {
     -- box_block_secondary = "<leader>hBB",
     -- box_set_comment = "<leader>hBs",
     -- convert_lines_to_nodes = "<leader>hN",
-    -- remove_disturbing_prefix = "<leader>hC",
+    -- remove_disturbing_prefix = "<leader>hD",
   },
   box = {
     comment = "# ",
