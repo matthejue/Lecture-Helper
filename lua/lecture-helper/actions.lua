@@ -16,6 +16,7 @@ local VIDEO_TIMESTAMP_FOLLOW_INTERVAL_SECONDS = 10
 local FOLLOW_VIDEO_TIMESTAMP_ONCE_SKIP_PLAYERCTL_WORKAROUND = false
 local video_timestamp_follow_timer = nil
 local video_timestamp_follow_last_line_by_buf = {}
+local reti_comment_hide_state_by_buf = {}
 
 local function apply_playerctl_position_workaround()
   if not state.opts.playerctl_position_workaround then
@@ -964,6 +965,45 @@ function M.remove_disturbing_prefix(start_line, end_line)
   vim.api.nvim_win_set_cursor(0, { start_line, 0 })
 end
 
+function M.insert_timestamp_ellipsis(start_line, end_line)
+  local mode = vim.fn.mode()
+  local in_visual = mode == "v" or mode == "V" or mode == ""
+
+  if not start_line or not end_line then
+    local start_pos = vim.fn.getpos("'<")
+    local end_pos = vim.fn.getpos("'>")
+    start_line = start_pos[2]
+    end_line = end_pos[2]
+  end
+
+  if start_line > end_line then
+    start_line, end_line = end_line, start_line
+  end
+
+  local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
+  if #lines == 0 then
+    return
+  end
+
+  local new_lines = {}
+  for _, line in ipairs(lines) do
+    if line:match("^%s*%- %d%d:%d%d:%d%d %.%.%. ") then
+      local updated = line:gsub("^(%s*%- %d%d:%d%d:%d%d )%.%.%. ", "%1", 1)
+      table.insert(new_lines, updated)
+    else
+      local updated = line:gsub("^(%s*%- %d%d:%d%d:%d%d )", "%1... ", 1)
+      table.insert(new_lines, updated)
+    end
+  end
+
+  vim.api.nvim_buf_set_lines(0, start_line - 1, end_line, false, new_lines)
+
+  if in_visual then
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", true)
+  end
+  vim.api.nvim_win_set_cursor(0, { start_line, 0 })
+end
+
 function M.bolden_timestamped_line()
   local line_num = vim.api.nvim_win_get_cursor(0)[1] -- Get current line number
   local line = vim.api.nvim_buf_get_lines(0, line_num - 1, line_num, false)[1]
@@ -1104,6 +1144,53 @@ function M.set_box_comment()
   end
   state.opts.box = state.opts.box or {}
   state.opts.box.comment = input
+end
+
+function M.toggle_reti_comments()
+  if vim.fn.expand("%:e") ~= "reti" then
+    print("ToggleRetiComments only works for .reti files")
+    return
+  end
+
+  local bufnr = vim.api.nvim_get_current_buf()
+  local hidden_state = reti_comment_hide_state_by_buf[bufnr]
+
+  if hidden_state then
+    local visible_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+    if #visible_lines ~= hidden_state.visible_line_count then
+      print("Cannot restore RETI comments after inserting or deleting visible lines")
+      return
+    end
+
+    local restored_lines = {}
+    local visible_index = 1
+    for _, line in ipairs(hidden_state.original_lines) do
+      if line:match("^%s*#") then
+        table.insert(restored_lines, line)
+      else
+        table.insert(restored_lines, visible_lines[visible_index] or line)
+        visible_index = visible_index + 1
+      end
+    end
+
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, restored_lines)
+    reti_comment_hide_state_by_buf[bufnr] = nil
+    return
+  end
+
+  local original_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  local visible_lines = {}
+  for _, line in ipairs(original_lines) do
+    if not line:match("^%s*#") then
+      table.insert(visible_lines, line)
+    end
+  end
+
+  reti_comment_hide_state_by_buf[bufnr] = {
+    original_lines = original_lines,
+    visible_line_count = #visible_lines,
+  }
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, visible_lines)
 end
 
 return M

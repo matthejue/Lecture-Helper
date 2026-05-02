@@ -88,6 +88,9 @@ local function set_commands()
   vim.api.nvim_create_user_command("RemoveDisturbingPrefix", function(opts)
     actions.remove_disturbing_prefix(opts.line1, opts.line2)
   end, { desc = state.descs.remove_disturbing_prefix, range = true })
+  vim.api.nvim_create_user_command("InsertTimestampEllipsis", function(opts)
+    actions.insert_timestamp_ellipsis(opts.line1, opts.line2)
+  end, { desc = state.descs.insert_timestamp_ellipsis, range = true })
   vim.api.nvim_create_user_command("BoldenTimestamedLine", actions.bolden_timestamped_line,
     { desc = state.descs.bolden_timestamped_line })
   vim.api.nvim_create_user_command("InsertBoxLine", function()
@@ -105,6 +108,11 @@ local function set_commands()
   vim.api.nvim_create_user_command("SetBoxComment", function()
     actions.set_box_comment()
   end, { desc = state.descs.box_set_comment })
+  vim.api.nvim_create_user_command(
+    "ToggleRetiComments",
+    actions.toggle_reti_comments,
+    { desc = state.descs.toggle_reti_comments }
+  )
 end
 
 local function set_global_keybindings()
@@ -321,6 +329,25 @@ local function set_global_keybindings()
       { silent = true, desc = state.descs.remove_disturbing_prefix }
     )
   end
+  if state.opts.keys.insert_timestamp_ellipsis then
+    vim.keymap.set(
+      "n",
+      state.opts.keys.insert_timestamp_ellipsis,
+      function()
+        local line = vim.api.nvim_win_get_cursor(0)[1]
+        actions.insert_timestamp_ellipsis(line, line)
+      end,
+      { silent = true, desc = state.descs.insert_timestamp_ellipsis }
+    )
+    vim.keymap.set(
+      "v",
+      state.opts.keys.insert_timestamp_ellipsis,
+      function()
+        actions.insert_timestamp_ellipsis()
+      end,
+      { silent = true, desc = state.descs.insert_timestamp_ellipsis }
+    )
+  end
   if state.opts.keys.bolden_timestamped_line then
     vim.keymap.set(
       "n",
@@ -375,6 +402,14 @@ local function set_global_keybindings()
       state.opts.keys.box_set_comment,
       actions.set_box_comment,
       { silent = true, desc = state.descs.box_set_comment }
+    )
+  end
+  if state.opts.keys.toggle_reti_comments then
+    vim.keymap.set(
+      "n",
+      state.opts.keys.toggle_reti_comments,
+      actions.toggle_reti_comments,
+      { silent = true, desc = state.descs.toggle_reti_comments }
     )
   end
 end

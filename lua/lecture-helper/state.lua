@@ -30,12 +30,14 @@ M.descs = {
   convert_line_to_node = "Convert line to mindmap node",
   convert_lines_to_nodes = "Convert selected lines to mindmap children",
   remove_disturbing_prefix = "Remove leading bullet-like character from selected lines",
+  insert_timestamp_ellipsis = "Toggle '...' after timestamp on selected lines",
   bolden_timestamped_line = "Bolden timestamped line",
   box_line_primary = "Insert single-line comment box (primary char)",
   box_block_primary = "Insert 3-line comment box (primary char)",
   box_line_secondary = "Insert single-line comment box (secondary char)",
   box_block_secondary = "Insert 3-line comment box (secondary char)",
   box_set_comment = "Set box comment prefix",
+  toggle_reti_comments = "Toggle hiding RETI comment lines in current buffer",
 }
 
 M.subtitles_file_path = ""

@@ -31,8 +31,9 @@ local default_options = {
     -- box_line_secondary = "<leader>hBL",
     -- box_block_secondary = "<leader>hBB",
     -- box_set_comment = "<leader>hBs",
+    -- toggle_reti_comments = "<leader>hH",
     -- convert_lines_to_nodes = "<leader>hN",
-    -- remove_disturbing_prefix = "<leader>hD",
+    -- insert_timestamp_ellipsis = "<leader>hD",
   },
   box = {
     comment = "# ",
